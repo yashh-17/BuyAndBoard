@@ -3,6 +3,7 @@ package shopnbook;
 import shopnbook.ecommerce.EcommerceApp;
 import shopnbook.ticketbooking.TicketBookingApp;
 import shopnbook.game.*;
+import shopnbook.auth.AuthController;
 
 import java.util.Scanner;
 
@@ -10,6 +11,7 @@ public class AppMain {
     public static void main(String[] args) {
         Scanner sc = new Scanner(System.in);
         System.out.println("Welcome to BuyAndBoard!");
+        if (!AuthController.requireAuth(sc)) return;
         System.out.println("1. E-Commerce Shopping");
         System.out.println("2. Ticket Booking");
         System.out.println("0. Exit");
