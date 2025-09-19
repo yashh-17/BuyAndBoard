@@ -20,12 +20,8 @@ public class Cart {
     }
 
     public void addToCart(Product product, int qty) {
-        if (product.getStock() >= qty) {
-            items.put(product, items.getOrDefault(product, 0) + qty);
-            System.out.println(product.getName() + " added to cart x" + qty);
-        } else {
-            System.out.println("Not enough stock");
-        }
+        items.put(product, items.getOrDefault(product, 0) + qty);
+        System.out.println(product.getName() + " added to cart x" + qty);
     }
 
     public void removeFromCart(Product product) {
@@ -68,11 +64,6 @@ public class Cart {
 
         // Deduct balance
         user.deductBalance(total);
-
-        // Reduce stock
-        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
-            entry.getKey().reduceStock(entry.getValue());
-        }
 
         // Create order with a shallow copy of items to keep record
         Map<Product, Integer> snapshot = new LinkedHashMap<>(items);
