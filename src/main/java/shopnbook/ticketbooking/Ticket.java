@@ -1,19 +1,47 @@
 package shopnbook.ticketbooking;
 
-// Model class for a booked ticket
-// Fields: ticketId, passengerName, seatNumber, pricePaid, bookingTime, Event flight
-// Add constructor, getters, and a formatted toString() later
-public class Ticket {
-    // TODO: Define fields
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-    // TODO: Constructor
-    public Ticket() {
-        // TODO: Initialize fields
+// Model class for a booked ticket
+public class Ticket {
+    private String ticketId;
+    private String passengerName;
+    private String seatNumber;
+    private double pricePaid;
+    private LocalDateTime bookingTime;
+    private Event flight;
+
+    // Constructor
+    public Ticket(Event flight, String passengerName, String seatNumber, double pricePaid) {
+        this.ticketId = UUID.randomUUID().toString().substring(0, 8); // short unique ID
+        this.flight = flight;
+        this.passengerName = passengerName;
+        this.seatNumber = seatNumber;
+        this.pricePaid = pricePaid;
+        this.bookingTime = LocalDateTime.now();
     }
 
-    // TODO: Add getters
+    // Getters
+    public String getTicketId() { return ticketId; }
+    public String getPassengerName() { return passengerName; }
+    public String getSeatNumber() { return seatNumber; }
+    public double getPricePaid() { return pricePaid; }
+    public LocalDateTime getBookingTime() { return bookingTime; }
+    public Event getFlight() { return flight; }
 
-    // TODO: Add toString() later for formatted ticket summary
+    @Override
+    public String toString() {
+        return String.format(
+                "Ticket ID: %s\nPassenger: %s\nFlight: %s (%s → %s)\nSeat: %s\nPrice Paid: ₹%.2f\nBooked At: %s\n",
+                ticketId,
+                passengerName,
+                flight.getFlightId(),
+                flight.getOrigin(),
+                flight.getDestination(),
+                seatNumber,
+                pricePaid,
+                bookingTime
+        );
+    }
 }
-
-
