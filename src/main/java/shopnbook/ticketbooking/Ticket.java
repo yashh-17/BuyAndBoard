@@ -1,6 +1,7 @@
 package shopnbook.ticketbooking;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.UUID;
 
 // Model class for a booked ticket
@@ -8,7 +9,7 @@ public class Ticket {
     private String ticketId;
     private String passengerName;
     private String seatNumber;
-    private double pricePaid;
+    private double pricePaid;  // keep field name same to avoid breaking other code
     private LocalDateTime bookingTime;
     private Event flight;
 
@@ -33,7 +34,7 @@ public class Ticket {
     @Override
     public String toString() {
         return String.format(
-                "Ticket ID: %s\nPassenger: %s\nFlight: %s (%s → %s)\nSeat: %s\nPrice Paid: ₹%.2f\nBooked At: %s\n",
+                "Ticket ID: %s\nPassenger: %s\nFlight: %s (%s → %s)\nSeat: %s\nPrice: ₹%.2f\nBooked At: %s\n",
                 ticketId,
                 passengerName,
                 flight.getFlightId(),
@@ -43,5 +44,41 @@ public class Ticket {
                 pricePaid,
                 bookingTime
         );
+    }
+
+    // ==============================
+    // 🚀 New Helper for Round-Trip
+    // ==============================
+    public static void printRoundTrip(List<Ticket> tickets) {
+        if (tickets == null || tickets.size() < 2) {
+            System.out.println("⚠ Not enough tickets for round-trip printing.");
+            return;
+        }
+
+        System.out.println("\n🎫 ROUND-TRIP SUMMARY 🎫");
+        System.out.println("----------------------------");
+
+        Ticket onward = tickets.get(0);
+        Ticket returning = tickets.get(1);
+
+        System.out.printf("Passenger: %s\n", onward.getPassengerName());
+        System.out.printf("Onward Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                onward.getFlight().getFlightId(),
+                onward.getFlight().getOrigin(),
+                onward.getFlight().getDestination(),
+                onward.getSeatNumber(),
+                onward.getPricePaid());
+
+        System.out.printf("Return Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                returning.getFlight().getFlightId(),
+                returning.getFlight().getOrigin(),
+                returning.getFlight().getDestination(),
+                returning.getSeatNumber(),
+                returning.getPricePaid());
+
+        double total = onward.getPricePaid() + returning.getPricePaid();
+        System.out.printf("Total Price: ₹%.2f\n", total);
+
+        System.out.println("----------------------------");
     }
 }

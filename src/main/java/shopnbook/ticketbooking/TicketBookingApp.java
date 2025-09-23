@@ -20,7 +20,15 @@ public class TicketBookingApp {
         flights.add(new Event("SG303", "SpiceJet", "Mumbai", "Chennai",
                 LocalDateTime.of(2025, 9, 22, 14, 0),
                 "2h 30m", 4800.0, 5));
-
+        flights.add(new Event("AI404", "Air India", "Bangalore", "Delhi",
+                LocalDateTime.of(2025, 9, 23, 16, 45),
+                "2h 50m", 5000.0, 5));
+        flights.add(new Event("6E505", "IndiGo", "Chennai", "Mumbai",
+                LocalDateTime.of(2025, 9, 24, 12, 0),
+                "2h 20m", 4600.0, 5));
+        flights.add(new Event("SG606", "SpiceJet", "Delhi", "Mumbai",
+                LocalDateTime.of(2025, 9, 25, 9, 30),
+                "2h 15m", 4400.0, 5));
         // 2. Create handler with flight list
         BookingHandler handler = new BookingHandler(flights);
 
