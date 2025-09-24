@@ -47,7 +47,7 @@ public class Ticket {
     }
 
     // ==============================
-    // 🚀 New Helper for Round-Trip
+    // 🚀 Improved Helper for Round-Trip
     // ==============================
     public static void printRoundTrip(List<Ticket> tickets) {
         if (tickets == null || tickets.size() < 2) {
@@ -58,25 +58,39 @@ public class Ticket {
         System.out.println("\n🎫 ROUND-TRIP SUMMARY 🎫");
         System.out.println("----------------------------");
 
-        Ticket onward = tickets.get(0);
-        Ticket returning = tickets.get(1);
+        String passenger = tickets.get(0).getPassengerName();
+        System.out.printf("Passenger: %s\n", passenger);
 
-        System.out.printf("Passenger: %s\n", onward.getPassengerName());
-        System.out.printf("Onward Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
-                onward.getFlight().getFlightId(),
-                onward.getFlight().getOrigin(),
-                onward.getFlight().getDestination(),
-                onward.getSeatNumber(),
-                onward.getPricePaid());
+        for (int i = 0; i < tickets.size(); i++) {
+            Ticket t = tickets.get(i);
 
-        System.out.printf("Return Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
-                returning.getFlight().getFlightId(),
-                returning.getFlight().getOrigin(),
-                returning.getFlight().getDestination(),
-                returning.getSeatNumber(),
-                returning.getPricePaid());
+            if (i == 0) {
+                System.out.printf("Onward Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                        t.getFlight().getFlightId(),
+                        t.getFlight().getOrigin(),
+                        t.getFlight().getDestination(),
+                        t.getSeatNumber(),
+                        t.getPricePaid());
+            } else if (i == tickets.size() - 1) {
+                System.out.printf("Return Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                        t.getFlight().getFlightId(),
+                        t.getFlight().getOrigin(),
+                        t.getFlight().getDestination(),
+                        t.getSeatNumber(),
+                        t.getPricePaid());
+            } else {
+                System.out.printf("Layover Flight %d: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                        i,
+                        t.getFlight().getFlightId(),
+                        t.getFlight().getOrigin(),
+                        t.getFlight().getDestination(),
+                        t.getSeatNumber(),
+                        t.getPricePaid());
+            }
+        }
 
-        double total = onward.getPricePaid() + returning.getPricePaid();
+        // Calculate total price
+        double total = tickets.stream().mapToDouble(Ticket::getPricePaid).sum();
         System.out.printf("Total Price: ₹%.2f\n", total);
 
         System.out.println("----------------------------");

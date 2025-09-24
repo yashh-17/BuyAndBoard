@@ -120,73 +120,84 @@ public class BookingHandler {
     }
 
     // Generate and print ticket
-    public void generateAndPrintTicket(Event flight, String passengerName, double price) {
+ // Generate and print ticket
+    public void generateAndPrintTicket(Event flight, String passengerName, String seat, double price) {
         if (flight == null) return;
 
-        // Use the last booked seat
-        Ticket ticket = new Ticket(flight, passengerName, lastBookedSeat, price);
+        Ticket ticket = new Ticket(flight, passengerName, seat, price);
 
         System.out.println("\n🎟 TICKET DETAILS 🎟");
         System.out.println(ticket);
     }
 
+
     // ==============================
     // 🚀 New Round-Trip Booking Logic
     // ==============================
-    public void handleBooking() {
-        // Menu for journey type
-        System.out.println("\nSelect Journey Type:");
-        System.out.println("1. Single Way");
-        System.out.println("2. Round Trip");
+    // ==============================
+// 🚀 Fixed Round-Trip Booking Logic
+// ==============================
+public void handleBooking() {
+    // Menu for journey type
+    System.out.println("\nSelect Journey Type:");
+    System.out.println("1. Single Way");
+    System.out.println("2. Round Trip");
 
-        int choice = -1;
-        while (choice != 1 && choice != 2) {
-            System.out.print("Enter choice (1/2): ");
-            if (sc.hasNextInt()) {
-                choice = sc.nextInt();
-                sc.nextLine(); // consume newline
-                if (choice != 1 && choice != 2) {
-                    System.out.println("❌ Please enter 1 or 2.");
-                }
-            } else {
-                System.out.println("❌ Invalid input. Please enter a number.");
-                sc.nextLine(); // clear invalid input
-            }
-        }
-        isRoundTrip = (choice == 2);
-
-        String passenger = takePassengerInput();
-
-        // Onward journey
-        System.out.print("Enter Origin: ");
-        String origin = sc.nextLine();
-        System.out.print("Enter Destination: ");
-        String destination = sc.nextLine();
-
-        List<Event> onwardFlights = filterFlights(origin, destination);
-        Event onwardFlight = selectFlightAndSeat(onwardFlights);
-        double onwardPrice = bookFlight(onwardFlight, passenger);
-
-        // Return journey if round-trip
-        if (isRoundTrip) {
-            List<Event> returnFlights = filterFlights(destination, origin);
-            System.out.println("\n🔄 Select Return Flight");
-            Event returnFlight = selectFlightAndSeat(returnFlights);
-            double returnPrice = bookFlight(returnFlight, passenger);
-
-            // Store tickets in a list
-            List<Ticket> tickets = new ArrayList<>();
-            tickets.add(new Ticket(onwardFlight, passenger, lastBookedSeat, onwardPrice));
-            tickets.add(new Ticket(returnFlight, passenger, lastBookedSeat, returnPrice));
-
-            // Print all tickets
-            System.out.println("\n🎫 ROUND-TRIP TICKETS 🎫");
-            for (Ticket t : tickets) {
-                System.out.println(t);
+    int choice = -1;
+    while (choice != 1 && choice != 2) {
+        System.out.print("Enter choice (1/2): ");
+        if (sc.hasNextInt()) {
+            choice = sc.nextInt();
+            sc.nextLine(); // consume newline
+            if (choice != 1 && choice != 2) {
+                System.out.println("❌ Please enter 1 or 2.");
             }
         } else {
-            // One-way booking
-            generateAndPrintTicket(onwardFlight, passenger, onwardPrice);
+            System.out.println("❌ Invalid input. Please enter a number.");
+            sc.nextLine(); // clear invalid input
         }
     }
+    isRoundTrip = (choice == 2);
+
+    String passenger = takePassengerInput();
+
+    // Onward journey
+    System.out.print("Enter Origin: ");
+    String origin = sc.nextLine();
+    System.out.print("Enter Destination: ");
+    String destination = sc.nextLine();
+
+    List<Event> onwardFlights = filterFlights(origin, destination);
+    Event onwardFlight = selectFlightAndSeat(onwardFlights);
+    double onwardPrice = bookFlight(onwardFlight, passenger);
+
+    // Save onward seat before it gets overwritten
+    String onwardSeat = lastBookedSeat;
+
+    // Return journey if round-trip
+    if (isRoundTrip) {
+        List<Event> returnFlights = filterFlights(destination, origin);
+        System.out.println("\n🔄 Select Return Flight");
+        Event returnFlight = selectFlightAndSeat(returnFlights);
+        double returnPrice = bookFlight(returnFlight, passenger);
+
+        // Save return seat separately
+        String returnSeat = lastBookedSeat;
+
+        // Store tickets in a list
+        List<Ticket> tickets = new ArrayList<>();
+        tickets.add(new Ticket(onwardFlight, passenger, onwardSeat, onwardPrice));
+        tickets.add(new Ticket(returnFlight, passenger, returnSeat, returnPrice));
+
+        // Print all tickets
+        System.out.println("\n🎫 ROUND-TRIP TICKETS 🎫");
+        for (Ticket t : tickets) {
+            System.out.println(t);
+        }
+    } else {
+        // One-way booking (pass lastBookedSeat too)
+        generateAndPrintTicket(onwardFlight, passenger, onwardSeat, onwardPrice);
+    }
+}
+
 }
