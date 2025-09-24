@@ -19,6 +19,9 @@ public class Event {
     private int availableSeats;
     private Map<String, Boolean> seatMap; // Seat -> true if booked
 
+    // Field to store the last booked seat for this flight
+    private String lastBookedSeat;
+
     // Constructor to initialize fields and seat map
     public Event(String flightId, String airline, String origin, String destination,
                  LocalDateTime departureTime, String duration,
@@ -35,7 +38,7 @@ public class Event {
         // Initialize seat map (false = free, true = booked)
         this.seatMap = new HashMap<>();
         for (int i = 1; i <= totalSeats; i++) {
-            seatMap.put("S" + i, false); // <-- make sure "S" is uppercase
+            seatMap.put("S" + i, false); // seats labeled S1, S2, ...
         }
     }
 
@@ -64,6 +67,15 @@ public class Event {
     public int getAvailableSeatsCount() { return availableSeats; }
     public Map<String, Boolean> getSeatMap() { return seatMap; }
 
+    // Last booked seat getters/setters
+    public void setLastBookedSeat(String seat) {
+        this.lastBookedSeat = seat;
+    }
+
+    public String getLastBookedSeat() {
+        return lastBookedSeat;
+    }
+
     // Book a seat
     public boolean bookSeat(String seatNumber) {
         if (!seatMap.containsKey(seatNumber)) {
@@ -76,18 +88,24 @@ public class Event {
         }
         seatMap.put(seatNumber, true);
         availableSeats--;
+        setLastBookedSeat(seatNumber); // store booked seat
         return true;
     }
 
-    // ✅ Return list of available seat numbers
+    // Return list of available seat numbers
     public List<String> getAvailableSeats() {
         List<String> available = new ArrayList<>();
         for (Map.Entry<String, Boolean> entry : seatMap.entrySet()) {
-            if (!entry.getValue()) { // if seat is not booked
+            if (!entry.getValue()) {
                 available.add(entry.getKey().toUpperCase());
             }
         }
         return available;
+    }
+
+    // Check if a seat is available
+    public boolean isSeatAvailable(String seatNumber) {
+        return seatMap.containsKey(seatNumber) && !seatMap.get(seatNumber);
     }
 
     @Override
