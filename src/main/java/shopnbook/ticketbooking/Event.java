@@ -64,7 +64,7 @@ public class Event {
     public double getBasePrice() { return basePrice; }
     public void setBasePrice(double basePrice) { this.basePrice = basePrice; }
 
-    public int getAvailableSeatsCount() { return availableSeats; }
+    public int getRemainingSeats() { return availableSeats; }
     public Map<String, Boolean> getSeatMap() { return seatMap; }
 
     // Last booked seat getters/setters
