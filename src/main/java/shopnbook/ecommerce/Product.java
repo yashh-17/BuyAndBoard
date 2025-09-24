@@ -5,18 +5,20 @@ public class Product {
     private String name;
     private double price;
     private String category;
+    private String subCategory;
     private double rating;
 
     public Product() {}
 
-    public Product(String productId, String name, double price, String category, double rating) {
+    public Product(String productId, String name, double price, String category, String subCategory, double rating) {
         this.productId = productId;
         this.name = name;
         this.price = price;
         this.category = category;
+        this.subCategory = subCategory;
         this.rating = rating;
     }
-
+    
     public String getProductId() { return productId; }
     public void setProductId(String productId) { this.productId = productId; }
 
@@ -29,18 +31,22 @@ public class Product {
     public String getCategory() { return category; }
     public void setCategory(String category) { this.category = category; }
 
+    public String getSubCategory() { return subCategory; }
+    public void setSubCategory(String subCategory) { this.subCategory = subCategory; }
+
     public double getRating() { return rating; }
     public void setRating(double rating) { this.rating = rating; }
 
-    public boolean matchesCategory(String categoryInput) {
-        return this.category != null && this.category.equalsIgnoreCase(categoryInput);
-    }
-
     @Override
     public String toString() {
-        String id = productId != null ? productId : "-";
-        String cat = category != null ? category : "-";
-        return String.format("ID: %s | Name: %s | $%.2f | Category: %s | Rating: %.1f",
-                id, name, price, cat, rating);
+        return String.format(
+            "ID: %s | %s | ₹%.2f | Category: %s | SubCategory: %s | Rating: %.1f",
+            productId != null ? productId : "-",
+            name,
+            price,
+            category != null ? category : "-",
+            subCategory != null ? subCategory : "-",
+            rating
+        );
     }
 }
