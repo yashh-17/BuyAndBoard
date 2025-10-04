@@ -2,8 +2,12 @@ package shopnbook;
 
 import shopnbook.ecommerce.EcommerceApp;
 import shopnbook.ticketbooking.TicketBookingApp;
-import shopnbook.game.*;
 import shopnbook.auth.AuthController;
+import shopnbook.utils.PurchaseCollector;
+import shopnbook.ecommerce.Cart;
+import shopnbook.ecommerce.Order;
+import shopnbook.ecommerce.User;
+import shopnbook.utils.CurrencyUtils;
 
 import java.util.Scanner;
 
@@ -16,6 +20,9 @@ public class AppMain {
         while (running) {
             System.out.println("1. E-Commerce Shopping");
             System.out.println("2. Ticket Booking");
+            System.out.println("3. View Cart");
+            System.out.println("4. Place Order");
+            System.out.println("5. View Purchase Summary");
             System.out.println("0. Exit");
             System.out.print("Select option: ");
             int choice = sc.nextInt();
@@ -25,7 +32,16 @@ public class AppMain {
                     EcommerceApp.start();
                     break;
                 case 2:
-                    TicketBookingApp.start();
+                    TicketBookingApp.start(PurchaseCollector.getInstance().getCurrentUser());
+                    break;
+                case 3:
+                    PurchaseCollector.getInstance().getCurrentCart().viewCart();
+                    break;
+                case 4:
+                    placeOrder(sc);
+                    break;
+                case 5:
+                    PurchaseCollector.getInstance().displayPurchaseSummary();
                     break;
                 case 0:
                     System.out.println("Exiting...");
@@ -34,6 +50,47 @@ public class AppMain {
                 default:
                     System.out.println("Invalid choice");
             }
+        }
+    }
+
+    private static void placeOrder(Scanner sc) {
+        Cart cart = PurchaseCollector.getInstance().getCurrentCart();
+
+        if (cart.getItems().isEmpty() && cart.getFlightBookings().isEmpty()) {
+            System.out.println("Your cart is empty. Add some items or book flights first!");
+            return;
+        }
+
+        // Show cart details
+        System.out.println("\n🛒 ORDER CONFIRMATION");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        cart.viewCart();
+
+        // Show purchase summary
+        System.out.println("\n📋 CURRENT PURCHASE SUMMARY:");
+        PurchaseCollector.getInstance().displayPurchaseSummary();
+
+        // Ask for confirmation
+        System.out.println("\n❓ Proceed to payment? (Y/N): ");
+        String confirmation = sc.next().trim().toUpperCase();
+
+        if (confirmation.equals("Y") || confirmation.equals("YES")) {
+            // Get user for payment
+            User user = cart.getUser();
+
+            // Proceed to payment
+            boolean paymentSuccess = EcommerceApp.processPayment(sc, cart, user);
+            if (paymentSuccess) {
+                Order order = cart.placeOrder();
+                if (order != null) {
+                    System.out.println("\n✅ PAYMENT SUCCESSFUL!");
+                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    System.out.println(order.toString());
+                    System.out.println("💰 Total Paid: " + CurrencyUtils.formatPrice(order.getTotal()));
+                }
+            }
+        } else {
+            System.out.println("Order cancelled. You can continue shopping.");
         }
     }
 }

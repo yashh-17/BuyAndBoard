@@ -1,5 +1,6 @@
 package shopnbook.auth;
 
+import shopnbook.utils.PurchaseCollector;
 import java.util.Scanner;
 
 public class AuthController {
@@ -41,6 +42,10 @@ public class AuthController {
             System.out.println("Invalid choice. Exiting...");
             return false;
         }
+
+        // Start new purchase collection session for authenticated user
+        PurchaseCollector.getInstance().startNewSession(username);
+        System.out.println("🛒 Session started for " + username);
 
         return true;
     }

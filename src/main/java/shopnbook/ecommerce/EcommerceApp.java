@@ -1,8 +1,11 @@
 package shopnbook.ecommerce;
 
+import shopnbook.utils.CurrencyUtils;
+import shopnbook.utils.PurchaseCollector;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
 
@@ -13,7 +16,8 @@ public class EcommerceApp {
         User user = new User("Alice", 2000.00);
         ProductCatalog.loadSampleProducts();
 
-        Cart cart = new Cart(user);
+        // Get shared cart from PurchaseCollector
+        Cart cart = PurchaseCollector.getInstance().getCurrentCart();
         Scanner sc = new Scanner(System.in);
 
         boolean running = true;
@@ -34,10 +38,38 @@ public class EcommerceApp {
                     cart.viewCart();
                     break;
                 case 3:
-                    Order order = cart.placeOrder();
-                    if (order != null) {
-                        System.out.println(order.toString());
-                        System.out.println("Remaining wallet balance: $" + String.format("%.2f", user.getWalletBalance()));
+                    if (cart.getItems().isEmpty() && cart.getFlightBookings().isEmpty()) {
+                        System.out.println("Your cart is empty. Add some items first!");
+                        break;
+                    }
+
+                    // Show cart details
+                    System.out.println("\n🛒 ORDER CONFIRMATION");
+                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                    cart.viewCart();
+
+                    // Show purchase summary
+                    System.out.println("\n📋 CURRENT PURCHASE SUMMARY:");
+                    PurchaseCollector.getInstance().displayPurchaseSummary();
+
+                    // Ask for confirmation
+                    System.out.println("\n❓ Proceed to payment? (Y/N): ");
+                    String confirmation = sc.next().trim().toUpperCase();
+
+                    if (confirmation.equals("Y") || confirmation.equals("YES")) {
+                        // Proceed to payment
+                        boolean paymentSuccess = processPayment(sc, cart, user);
+                        if (paymentSuccess) {
+                            Order order = cart.placeOrder();
+                            if (order != null) {
+                                System.out.println("\n✅ PAYMENT SUCCESSFUL!");
+                                System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                                System.out.println(order.toString());
+                                System.out.println("💰 Total Paid: " + CurrencyUtils.formatPrice(order.getTotal()));
+                            }
+                        }
+                    } else {
+                        System.out.println("Order cancelled. You can continue shopping.");
                     }
                     break;
                 case 0:
@@ -108,6 +140,143 @@ public class EcommerceApp {
         }
 
         cart.addToCart(filtered.get(pidx), qty);
+    }
+
+    public static boolean processPayment(Scanner sc, Cart cart, User user) {
+        return processPayment(sc, cart, user, -1.0); // Use -1 as default for backward compatibility
+    }
+
+    public static boolean processPayment(Scanner sc, Cart cart, User user, double amount) {
+        double total = 0.0;
+
+        if (cart != null) {
+            // Calculate from cart (e-commerce scenario)
+            for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
+                total += entry.getKey().getPrice() * entry.getValue();
+            }
+        } else if (amount > 0) {
+            // Use provided amount (flight booking scenario)
+            total = amount;
+        } else {
+            System.out.println("❌ Invalid payment configuration.");
+            return false;
+        }
+
+        System.out.println("\n💳 PAYMENT OPTIONS");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("1. 💳 Credit/Debit Card");
+        System.out.println("2. 📱 UPI (Unified Payments Interface)");
+        System.out.println("4. 💰 Wallet (Current Balance: " + CurrencyUtils.formatPrice(user.getWalletBalance()) + ")");
+        System.out.println("0. ❌ Cancel Payment");
+        System.out.print("Select payment method: ");
+
+        int paymentChoice = safeNextInt(sc);
+
+        switch (paymentChoice) {
+            case 1:
+                return processCardPayment(sc, total, user);
+            case 2:
+                return processUPIPayment(sc, total, user);
+            case 4:
+                return processWalletPayment(total, user);
+            case 0:
+                System.out.println("Payment cancelled.");
+                return false;
+            default:
+                System.out.println("Invalid payment method selected.");
+                return false;
+        }
+    }
+
+    private static boolean processCardPayment(Scanner sc, double amount, User user) {
+        System.out.println("\n💳 CREDIT/DEBIT CARD PAYMENT");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.print("Enter card number (16 digits): ");
+        String cardNumber = sc.next();
+
+        if (cardNumber.length() != 16 || !cardNumber.matches("\\d+")) {
+            System.out.println("❌ Invalid card number. Payment failed.");
+            return false;
+        }
+
+        System.out.print("Enter expiry date (MM/YY): ");
+        String expiry = sc.next();
+
+        if (!expiry.matches("\\d{2}/\\d{2}")) {
+            System.out.println("❌ Invalid expiry date format. Payment failed.");
+            return false;
+        }
+
+        System.out.print("Enter CVV (3 digits): ");
+        String cvv = sc.next();
+
+        if (cvv.length() != 3 || !cvv.matches("\\d+")) {
+            System.out.println("❌ Invalid CVV. Payment failed.");
+            return false;
+        }
+
+        // Simulate payment processing
+        System.out.println("🔄 Processing card payment...");
+        try {
+            Thread.sleep(2000); // Simulate processing time
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("✅ Card payment successful!");
+        System.out.println("Amount paid: " + CurrencyUtils.formatPrice(amount));
+        return true;
+    }
+
+    private static boolean processUPIPayment(Scanner sc, double amount, User user) {
+        System.out.println("\n📱 UPI PAYMENT");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.print("Enter UPI ID (e.g., user@paytm): ");
+        String upiId = sc.next();
+
+        if (!upiId.contains("@")) {
+            System.out.println("❌ Invalid UPI ID format. Payment failed.");
+            return false;
+        }
+
+        // Simulate UPI payment processing
+        System.out.println("🔄 Processing UPI payment...");
+        try {
+            Thread.sleep(1500); // Simulate processing time
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("✅ UPI payment successful!");
+        System.out.println("Amount paid: " + CurrencyUtils.formatPrice(amount));
+        return true;
+    }
+
+    private static boolean processWalletPayment(double amount, User user) {
+        System.out.println("\n💰 WALLET PAYMENT");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+
+        if (user.getWalletBalance() < amount) {
+            System.out.println("❌ Insufficient wallet balance. Current balance: " + CurrencyUtils.formatPrice(user.getWalletBalance()));
+            System.out.println("   Required: " + CurrencyUtils.formatPrice(amount));
+            return false;
+        }
+
+        System.out.println("Current wallet balance: " + CurrencyUtils.formatPrice(user.getWalletBalance()));
+        System.out.println("Amount to pay: " + CurrencyUtils.formatPrice(amount));
+        System.out.print("Confirm wallet payment? (Y/N): ");
+
+        Scanner sc = new Scanner(System.in);
+        String confirm = sc.next().trim().toUpperCase();
+
+        if (confirm.equals("Y") || confirm.equals("YES")) {
+            user.deductBalance(amount);
+            System.out.println("✅ Wallet payment successful!");
+            return true;
+        } else {
+            System.out.println("❌ Wallet payment cancelled.");
+            return false;
+        }
     }
 
     private static int safeNextInt(Scanner sc) {

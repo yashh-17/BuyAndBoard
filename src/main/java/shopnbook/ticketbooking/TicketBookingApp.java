@@ -4,11 +4,20 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import shopnbook.ecommerce.EcommerceApp;
+import shopnbook.ecommerce.Cart;
+import shopnbook.ecommerce.User;
+import shopnbook.utils.CurrencyUtils;
+import shopnbook.utils.PurchaseCollector;
 
 public class TicketBookingApp {
 
-    public static void start() {
+    public static void start(String currentUsername) {
         System.out.println("Welcome to Ticket Booking!");
+
+        // Get shared cart from PurchaseCollector
+        Cart cart = PurchaseCollector.getInstance().getCurrentCart();
+        Scanner sc = new Scanner(System.in);
 
         // 1. Create sample flights
         List<Event> flights = new ArrayList<>();
@@ -49,8 +58,6 @@ public class TicketBookingApp {
         // 2. Create booking handler
         BookingHandler handler = new BookingHandler(flights);
 
-        Scanner sc = new Scanner(System.in);
-
         // 3. Select journey type
         System.out.println("\nSelect Journey Type:");
         System.out.println("1. One-way");
@@ -74,7 +81,7 @@ public class TicketBookingApp {
         // 5. Onward journey
         System.out.print("\nEnter Origin: ");
         String origin = sc.nextLine().trim();
-        System.out.print("Enter Destination: ");
+        System.out.print("Enter destination: ");
         String destination = sc.nextLine().trim();
 
         List<Event> onwardFlights = handler.filterFlights(origin, destination);
@@ -99,17 +106,29 @@ public class TicketBookingApp {
             returnPrice = handler.bookFlight(returnFlight, passenger);
         }
 
-        // 7. Print tickets
-        //System.out.println("\n🎫 TICKETS 🎫");
-        handler.generateAndPrintTicket(onwardFlight, passenger, onwardFlight.getLastBookedSeat(), onwardPrice);
+        // 7. Calculate total amount and add to cart (NO immediate payment)
+        double totalAmount = onwardPrice + returnPrice;
+
+        System.out.println("\n💰 FLIGHT BOOKING SUMMARY");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("Onward Flight: " + onwardFlight.getFlightId() + " (" + origin + " → " + destination + ")");
+        System.out.println("Price: " + CurrencyUtils.formatPrice(onwardPrice));
         if (isRoundTrip && returnFlight != null) {
-            handler.generateAndPrintTicket(returnFlight, passenger, returnFlight.getLastBookedSeat(), returnPrice);
+            System.out.println("Return Flight: " + returnFlight.getFlightId() + " (" + destination + " → " + origin + ")");
+            System.out.println("Price: " + CurrencyUtils.formatPrice(returnPrice));
+        }
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
+
+        // Add flights to cart instead of immediate payment
+        cart.addFlightBooking(onwardFlight, passenger, onwardFlight.getLastBookedSeat(), onwardPrice);
+        if (isRoundTrip && returnFlight != null) {
+            cart.addFlightBooking(returnFlight, passenger, returnFlight.getLastBookedSeat(), returnPrice);
         }
 
-        System.out.println("✅ Booking completed!");
-    }
-
-    public static void main(String[] args) {
-        start();
+        System.out.println("\n✅ FLIGHTS ADDED TO CART!");
+        System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+        System.out.println("💰 Total in Cart: " + CurrencyUtils.formatPrice(totalAmount));
+        System.out.println("📋 You can now 'Place Order' from the main menu to pay for everything!");
     }
 }

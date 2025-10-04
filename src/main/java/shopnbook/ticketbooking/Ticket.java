@@ -1,5 +1,6 @@
 package shopnbook.ticketbooking;
 
+import shopnbook.utils.CurrencyUtils;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
@@ -34,14 +35,14 @@ public class Ticket {
     @Override
     public String toString() {
         return String.format(
-                "Ticket ID: %s\nPassenger: %s\nFlight: %s (%s → %s)\nSeat: %s\nPrice: ₹%.2f\nBooked At: %s\n",
+                "Ticket ID: %s\nPassenger: %s\nFlight: %s (%s → %s)\nSeat: %s\nPrice: %s\nBooked At: %s\n",
                 ticketId,
                 passengerName,
                 flight.getFlightId(),
                 flight.getOrigin(),
                 flight.getDestination(),
                 seatNumber,
-                pricePaid,
+                CurrencyUtils.formatPrice(pricePaid),
                 bookingTime
         );
     }
@@ -65,33 +66,33 @@ public class Ticket {
             Ticket t = tickets.get(i);
 
             if (i == 0) {
-                System.out.printf("Onward Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                System.out.printf("Onward Flight: %s (%s → %s), Seat %s, Price %s\n",
                         t.getFlight().getFlightId(),
                         t.getFlight().getOrigin(),
                         t.getFlight().getDestination(),
                         t.getSeatNumber(),
-                        t.getPricePaid());
+                        CurrencyUtils.formatPrice(t.getPricePaid()));
             } else if (i == tickets.size() - 1) {
-                System.out.printf("Return Flight: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                System.out.printf("Return Flight: %s (%s → %s), Seat %s, Price %s\n",
                         t.getFlight().getFlightId(),
                         t.getFlight().getOrigin(),
                         t.getFlight().getDestination(),
                         t.getSeatNumber(),
-                        t.getPricePaid());
+                        CurrencyUtils.formatPrice(t.getPricePaid()));
             } else {
-                System.out.printf("Layover Flight %d: %s (%s → %s), Seat %s, Price ₹%.2f\n",
+                System.out.printf("Layover Flight %d: %s (%s → %s), Seat %s, Price %s\n",
                         i,
                         t.getFlight().getFlightId(),
                         t.getFlight().getOrigin(),
                         t.getFlight().getDestination(),
                         t.getSeatNumber(),
-                        t.getPricePaid());
+                        CurrencyUtils.formatPrice(t.getPricePaid()));
             }
         }
 
         // Calculate total price
         double total = tickets.stream().mapToDouble(Ticket::getPricePaid).sum();
-        System.out.printf("Total Price: ₹%.2f\n", total);
+        System.out.printf("Total Price: %s\n", CurrencyUtils.formatPrice(total));
 
         System.out.println("----------------------------");
     }

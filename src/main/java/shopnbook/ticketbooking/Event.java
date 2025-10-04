@@ -1,5 +1,6 @@
 package shopnbook.ticketbooking;
 
+import shopnbook.utils.CurrencyUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -108,11 +109,29 @@ public class Event {
         return seatMap.containsKey(seatNumber) && !seatMap.get(seatNumber);
     }
 
+    // Release a seat (make it available again)
+    public boolean releaseSeat(String seatNumber) {
+        if (!seatMap.containsKey(seatNumber)) {
+            System.out.println("⚠ Invalid seat number: " + seatNumber);
+            return false;
+        }
+        if (!seatMap.get(seatNumber)) {
+            System.out.println("⚠ Seat " + seatNumber + " is already available.");
+            return false;
+        }
+        seatMap.put(seatNumber, false);
+        availableSeats++;
+        if (lastBookedSeat != null && lastBookedSeat.equals(seatNumber)) {
+            lastBookedSeat = null; // Clear last booked seat if this was it
+        }
+        return true;
+    }
+
     @Override
     public String toString() {
         DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd-MMM-yyyy HH:mm");
-        return String.format("[%s] %s → %s | %s | %s | ₹%.2f | Seats left: %d",
+        return String.format("[%s] %s → %s | %s | %s | %s | Seats left: %d",
                 flightId, origin, destination,
-                departureTime.format(fmt), airline, basePrice, availableSeats);
+                departureTime.format(fmt), airline, CurrencyUtils.formatPrice(basePrice), availableSeats);
     }
 }

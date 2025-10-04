@@ -1,5 +1,7 @@
 package shopnbook.ecommerce;
 
+import shopnbook.utils.CurrencyUtils;
+
 public class Product {
     private String productId;
     private String name;
@@ -40,10 +42,10 @@ public class Product {
     @Override
     public String toString() {
         return String.format(
-            "ID: %s | %s | ₹%.2f | Category: %s | SubCategory: %s | Rating: %.1f",
+            "ID: %s | %s | %s | Category: %s | SubCategory: %s | Rating: %.1f",
             productId != null ? productId : "-",
             name,
-            price,
+            CurrencyUtils.formatPrice(price),
             category != null ? category : "-",
             subCategory != null ? subCategory : "-",
             rating
