@@ -47,7 +47,9 @@ public class Event {
     public void setOrigin(String origin) { this.origin = origin; }
 
     public String getDestination() { return destination; }
-    public void setDestination(String destination) { this.destination = destination; }
+    public double getPrice() {
+        return basePrice;
+    }
 
     public LocalDateTime getDepartureTime() { return departureTime; }
     public void setDepartureTime(LocalDateTime departureTime) { this.departureTime = departureTime; }
@@ -87,6 +89,31 @@ public class Event {
             }
         }
         return available;
+    }
+
+    // Seat type helpers
+    // Simple 6-seat-per-row layout: [W, M, A, A, M, W]
+    public char getSeatType(String seatNumber) {
+        try {
+            int n = Integer.parseInt(seatNumber.substring(1));
+            int pos = (n - 1) % 6;
+            switch (pos) {
+                case 0: return 'W'; // Window
+                case 1: return 'M'; // Middle
+                case 2: return 'A'; // Aisle
+                case 3: return 'A'; // Aisle
+                case 4: return 'M'; // Middle
+                case 5: return 'W'; // Window
+                default: return 'M';
+            }
+        } catch (Exception e) {
+            return 'M';
+        }
+    }
+
+    public String formatSeatWithType(String seatNumber) {
+        char t = getSeatType(seatNumber);
+        return seatNumber.toUpperCase() + "(" + t + ")";
     }
 
     public boolean isSeatAvailable(String seatNumber) {

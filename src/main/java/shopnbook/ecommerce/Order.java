@@ -18,6 +18,7 @@ public class Order {
     private List<FlightBooking> flightBookings;
     private double total;
     private OrderStatus status;
+    private DeliveryDetails deliveryDetails;
 
     public Order(Map<Product, Integer> items, double total) {
         this(items, new ArrayList<>(), total);
@@ -53,6 +54,30 @@ public class Order {
 
     public void setStatus(OrderStatus status) {
         this.status = status;
+    }
+
+    public DeliveryDetails getDeliveryDetails() {
+        return deliveryDetails;
+    }
+
+    public void setDeliveryDetails(DeliveryDetails deliveryDetails) {
+        this.deliveryDetails = deliveryDetails;
+    }
+
+    public double getEcomSubtotal() {
+        double total = 0.0;
+        for (Map.Entry<Product, Integer> entry : items.entrySet()) {
+            total += entry.getKey().getPrice() * entry.getValue();
+        }
+        return total;
+    }
+
+    public double getFlightSubtotal() {
+        double total = 0.0;
+        for (FlightBooking booking : flightBookings) {
+            total += booking.getPrice();
+        }
+        return total;
     }
 
     @Override

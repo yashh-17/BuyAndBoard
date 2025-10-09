@@ -6,9 +6,7 @@ import shopnbook.auth.AuthController;
 import shopnbook.utils.PurchaseCollector;
 import shopnbook.ecommerce.Cart;
 import shopnbook.ecommerce.Order;
-import shopnbook.ecommerce.User;
 import shopnbook.utils.CurrencyUtils;
-
 import java.util.Scanner;
 
 public class AppMain {
@@ -72,16 +70,12 @@ public class AppMain {
         String confirmation = sc.next().trim().toUpperCase();
 
         if (confirmation.equals("Y") || confirmation.equals("YES")) {
-            User user = cart.getUser();
-            boolean paymentSuccess = EcommerceApp.processPayment(sc, cart, user);
-            if (paymentSuccess) {
-                Order order = cart.placeOrder();
-                if (order != null) {
-                    System.out.println("\n✅ PAYMENT SUCCESSFUL!");
-                    System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
-                    System.out.println(order.toString());
-                    System.out.println("💰 Total Paid: " + CurrencyUtils.formatPrice(order.getTotal()));
-                }
+            Order order = cart.placeOrder(null); // No delivery for unified order
+            if (order != null) {
+                System.out.println("\n✅ ORDER PLACED!");
+                System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
+                System.out.println(order.toString());
+                System.out.println("💰 Total: " + CurrencyUtils.formatPrice(order.getTotal()));
             }
         } else {
             System.out.println("Order cancelled. You can continue shopping.");

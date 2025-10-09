@@ -4,9 +4,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
-import shopnbook.ecommerce.EcommerceApp;
 import shopnbook.ecommerce.Cart;
-import shopnbook.ecommerce.User;
 import shopnbook.utils.CurrencyUtils;
 import shopnbook.utils.PurchaseCollector;
 
@@ -67,38 +65,66 @@ public class TicketBookingApp {
                 journeyChoice = sc.nextInt();
                 sc.nextLine();
             } else {
-                System.out.println("❌ Invalid input. Enter 1 or 2.");
                 sc.nextLine();
             }
         }
         boolean isRoundTrip = (journeyChoice == 2);
 
-        String passenger = handler.takePassengerInput();
-
-        System.out.print("\nEnter Origin: ");
+        System.out.print("Enter Passenger Name: ");
+        String passengerName = sc.nextLine().trim();
+        System.out.print("Enter Origin: ");
         String origin = sc.nextLine().trim();
-        System.out.print("Enter destination: ");
+        System.out.print("Enter Destination: ");
         String destination = sc.nextLine().trim();
 
         List<Event> onwardFlights = handler.filterFlights(origin, destination);
         if (onwardFlights.isEmpty()) {
-            System.out.println("❌ No flights found for " + origin + " → " + destination);
+            System.out.println("❌ No flights available for this route.");
             return;
         }
-        Event onwardFlight = handler.selectFlightAndSeat(onwardFlights);
-        double onwardPrice = handler.bookFlight(onwardFlight, passenger);
+
+        System.out.println("Select Flight by Index:");
+        for (int i = 0; i < onwardFlights.size(); i++) {
+            Event f = onwardFlights.get(i);
+            System.out.println(i + ". " + f.toString());
+        }
+
+        System.out.print("Enter flight index: ");
+        int flightIndex = sc.nextInt();
+        sc.nextLine();
+        if (flightIndex < 0 || flightIndex >= onwardFlights.size()) {
+            System.out.println("❌ Invalid flight selection.");
+            return;
+        }
+
+        Event onwardFlight = onwardFlights.get(flightIndex);
+        double onwardPrice = handler.bookFlight(onwardFlight, passengerName);
+
+        // Use grouped seat selection with case-insensitive handling; this books the seat and decrements availability
+        String selectedSeat = handler.selectSeatForFlight(onwardFlight);
+        if (selectedSeat != null) {
+            cart.addFlightBooking(onwardFlight, passengerName, selectedSeat, onwardPrice);
+            System.out.println("💰 Ticket Price: " + onwardFlight.getPrice());
+        } else {
+            System.out.println("❌ Invalid seat selection or no seat booked.");
+        }
 
         Event returnFlight = null;
         double returnPrice = 0;
         if (isRoundTrip) {
-            System.out.println("\nSelect Return Flight:");
             List<Event> returnFlights = handler.filterFlights(destination, origin);
             if (returnFlights.isEmpty()) {
                 System.out.println("❌ No return flights available.");
                 return;
             }
             returnFlight = handler.selectFlightAndSeat(returnFlights);
-            returnPrice = handler.bookFlight(returnFlight, passenger);
+            returnPrice = handler.bookFlight(returnFlight, passengerName);
+            if (returnFlight != null) {
+                String returnSeat = handler.getLastBookedSeat();
+                if (returnSeat != null) {
+                    cart.addFlightBooking(returnFlight, passengerName, returnSeat, returnPrice);
+                }
+            }
         }
 
         double totalAmount = onwardPrice + returnPrice;
@@ -114,14 +140,14 @@ public class TicketBookingApp {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
 
-        cart.addFlightBooking(onwardFlight, passenger, onwardFlight.getLastBookedSeat(), onwardPrice);
-        if (isRoundTrip && returnFlight != null) {
-            cart.addFlightBooking(returnFlight, passenger, returnFlight.getLastBookedSeat(), returnPrice);
-        }
+        // Note: Flights were already added to cart immediately after seat selection.
+        // Avoid adding them again to prevent duplicates.
 
         System.out.println("\n✅ FLIGHTS ADDED TO CART!");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("💰 Total in Cart: " + CurrencyUtils.formatPrice(totalAmount));
         System.out.println("📋 You can now 'Place Order' from the main menu to pay for everything!");
     }
+
+    // Pagination-based seat selection method removed in favor of grouped seat selection in BookingHandler
 }
