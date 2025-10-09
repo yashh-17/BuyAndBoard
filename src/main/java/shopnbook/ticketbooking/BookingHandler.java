@@ -24,13 +24,15 @@ public class BookingHandler {
             System.out.println("⚠ No seats left on this flight!");
             return null;
         }
+        // Sort numerically and limit to first 15 seats
         availableSeats.sort((a, b) -> Integer.compare(Integer.parseInt(a.substring(1)), Integer.parseInt(b.substring(1))));
+        List<String> limited = new ArrayList<>(availableSeats.subList(0, Math.min(15, availableSeats.size())));
 
-        // Group seats by type
+        // Group limited seats by type
         List<String> middle = new ArrayList<>();
         List<String> aisle = new ArrayList<>();
         List<String> window = new ArrayList<>();
-        for (String s : availableSeats) {
+        for (String s : limited) {
             char t = chosen.getSeatType(s);
             String label = chosen.formatSeatWithType(s);
             if (t == 'M') middle.add(label);
@@ -38,7 +40,7 @@ public class BookingHandler {
             else window.add(label);
         }
 
-        // Display grouped lists
+        // Display grouped lists (only the limited seats)
         if (!middle.isEmpty()) System.out.println("MIDDLE SEATS: " + String.join(" ", middle));
         if (!aisle.isEmpty()) System.out.println("AISLE SEATS: " + String.join(" ", aisle));
         if (!window.isEmpty()) System.out.println("WINDOW SEATS: " + String.join(" ", window));
@@ -47,7 +49,7 @@ public class BookingHandler {
         while (true) {
             System.out.print("Enter Seat Number to Book: ");
             seat = sc.nextLine().trim().toUpperCase();
-            if (availableSeats.contains(seat)) {
+            if (limited.contains(seat)) {
                 break;
             } else {
                 System.out.println("❌ Invalid seat. Please choose from the displayed seats (e.g., S3).");
