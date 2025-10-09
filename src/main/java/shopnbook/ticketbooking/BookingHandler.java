@@ -132,6 +132,7 @@ public class BookingHandler {
         System.out.println("💰 Ticket Price: " + price);
         return price;
     }
+    //
 
     public void generateAndPrintTicket(Event flight, String passengerName, String seat, double price) {
         if (flight == null) return;
