@@ -41,7 +41,7 @@ public class PurchaseCollector {
 
     public Cart getCurrentCart() {
         if (currentCart == null) {
-            User user = new User(currentUser, 10000.0); 
+            User user = new User(currentUser); 
             currentCart = new Cart(user);
         }
         return currentCart;
@@ -190,8 +190,9 @@ public class PurchaseCollector {
             List.of("Description", "Amount"),
             List.of(
                 List.of("Confirmed E-commerce Purchases", CurrencyUtils.formatPrice(getTotalEcommerceValue())),
-                List.of("Flight Tickets", CurrencyUtils.formatPrice(getTotalTicketValue())),
-                List.of("TOTAL PAID", CurrencyUtils.formatPrice(getTotalWorth()))
+                List.of("Confirmed Flight Tickets", CurrencyUtils.formatPrice(getTotalTicketValue())),
+                List.of("Total Confirmed Purchases", CurrencyUtils.formatPrice(getTotalWorth())),
+                List.of("Pending Cart Total (Not Paid)", CurrencyUtils.formatPrice(pendingValue))
             ),
             List.of(37, 13)
         );

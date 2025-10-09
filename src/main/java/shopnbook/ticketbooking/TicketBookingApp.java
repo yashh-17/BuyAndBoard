@@ -2,6 +2,8 @@ package shopnbook.ticketbooking;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
 import shopnbook.ecommerce.EcommerceApp;
@@ -67,38 +69,73 @@ public class TicketBookingApp {
                 journeyChoice = sc.nextInt();
                 sc.nextLine();
             } else {
-                System.out.println("❌ Invalid input. Enter 1 or 2.");
                 sc.nextLine();
             }
         }
         boolean isRoundTrip = (journeyChoice == 2);
 
-        String passenger = handler.takePassengerInput();
-
-        System.out.print("\nEnter Origin: ");
+        System.out.print("Enter Passenger Name: ");
+        String passengerName = sc.nextLine().trim();
+        System.out.print("Enter Origin: ");
         String origin = sc.nextLine().trim();
-        System.out.print("Enter destination: ");
+        System.out.print("Enter Destination: ");
         String destination = sc.nextLine().trim();
 
         List<Event> onwardFlights = handler.filterFlights(origin, destination);
         if (onwardFlights.isEmpty()) {
-            System.out.println("❌ No flights found for " + origin + " → " + destination);
+            System.out.println("❌ No flights available for this route.");
             return;
         }
-        Event onwardFlight = handler.selectFlightAndSeat(onwardFlights);
-        double onwardPrice = handler.bookFlight(onwardFlight, passenger);
+
+        System.out.println("Select Flight by Index:");
+        for (int i = 0; i < onwardFlights.size(); i++) {
+            Event f = onwardFlights.get(i);
+            System.out.println(i + ". " + f.toString());
+        }
+
+        System.out.print("Enter flight index: ");
+        int flightIndex = sc.nextInt();
+        sc.nextLine();
+        if (flightIndex < 0 || flightIndex >= onwardFlights.size()) {
+            System.out.println("❌ Invalid flight selection.");
+            return;
+        }
+
+        Event onwardFlight = onwardFlights.get(flightIndex);
+        String selectedFlightId = onwardFlight.getFlightId();
+        double onwardPrice = handler.bookFlight(onwardFlight, passengerName);
+
+        List<String> availableSeats = Arrays.asList("S1", "S10", "S100", "S91", "S92", "S93", "S94", "S95", "S96", "S97", "S98", "S99");
+
+        // Sort seats numerically
+        Collections.sort(availableSeats, (a, b) -> {
+            int numA = Integer.parseInt(a.substring(1));
+            int numB = Integer.parseInt(b.substring(1));
+            return Integer.compare(numA, numB);
+        });
+
+        System.out.println("Available Seats (sorted):");
+        String selectedSeat = selectSeatWithPagination(availableSeats, sc);
+
+        if (selectedSeat != null && availableSeats.contains(selectedSeat)) {
+            onwardFlight.bookSeat(selectedSeat);
+            cart.addFlightBooking(onwardFlight, passengerName, selectedSeat, onwardPrice);
+            System.out.println("✅ Seat " + selectedSeat + " booked on flight " + selectedFlightId);
+            System.out.println("💰 Ticket Price: " + onwardFlight.getPrice());
+        } else {
+            System.out.println("❌ Invalid seat selection or no seat booked.");
+        }
 
         Event returnFlight = null;
         double returnPrice = 0;
         if (isRoundTrip) {
-            System.out.println("\nSelect Return Flight:");
             List<Event> returnFlights = handler.filterFlights(destination, origin);
             if (returnFlights.isEmpty()) {
                 System.out.println("❌ No return flights available.");
                 return;
             }
             returnFlight = handler.selectFlightAndSeat(returnFlights);
-            returnPrice = handler.bookFlight(returnFlight, passenger);
+            returnPrice = handler.bookFlight(returnFlight, passengerName);
         }
 
         double totalAmount = onwardPrice + returnPrice;
@@ -114,14 +151,49 @@ public class TicketBookingApp {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
 
-        cart.addFlightBooking(onwardFlight, passenger, onwardFlight.getLastBookedSeat(), onwardPrice);
+        cart.addFlightBooking(onwardFlight, passengerName, onwardFlight.getLastBookedSeat(), onwardPrice);
         if (isRoundTrip && returnFlight != null) {
-            cart.addFlightBooking(returnFlight, passenger, returnFlight.getLastBookedSeat(), returnPrice);
+            cart.addFlightBooking(returnFlight, passengerName, returnFlight.getLastBookedSeat(), returnPrice);
         }
 
         System.out.println("\n✅ FLIGHTS ADDED TO CART!");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("💰 Total in Cart: " + CurrencyUtils.formatPrice(totalAmount));
         System.out.println("📋 You can now 'Place Order' from the main menu to pay for everything!");
+    }
+
+    private static String selectSeatWithPagination(List<String> seats, Scanner sc) {
+        final int SEATS_PER_PAGE = 10;
+        int page = 0;
+        while (page * SEATS_PER_PAGE < seats.size()) {
+            int start = page * SEATS_PER_PAGE;
+            int end = Math.min(start + SEATS_PER_PAGE, seats.size());
+            System.out.println("\n--- Page " + (page + 1) + " ---");
+            for (int i = start; i < end; i++) {
+                System.out.print(seats.get(i) + " ");
+            }
+            System.out.println();
+            if (end < seats.size()) {
+                System.out.print("Enter seat or 'N' for next page: ");
+                String input = sc.nextLine().trim();
+                if (input.equalsIgnoreCase("N")) {
+                    page++;
+                } else if (seats.contains(input)) {
+                    return input;
+                } else {
+                    System.out.println("❌ Invalid seat. Try again or 'N' for next page.");
+                }
+            } else {
+                System.out.print("Enter seat: ");
+                String input = sc.nextLine().trim();
+                if (seats.contains(input)) {
+                    return input;
+                } else {
+                    System.out.println("❌ Invalid seat.");
+                    return null;
+                }
+            }
+        }
+        return null;
     }
 }

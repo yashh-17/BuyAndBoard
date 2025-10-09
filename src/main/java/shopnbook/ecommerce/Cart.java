@@ -129,7 +129,7 @@ public class Cart {
         System.out.println("  Grand Total: " + CurrencyUtils.formatPrice(grandTotal));
     }
 
-    public Order placeOrder() {
+    public Order placeOrder(DeliveryDetails delivery) {
         if (items.isEmpty() && flightBookings.isEmpty()) {
             System.out.println("Nothing to order");
             return null;
@@ -149,6 +149,9 @@ public class Cart {
 
         Order confirmedOrder = new Order(productSnapshot, flightSnapshot, total);
         confirmedOrder.setStatus(Order.OrderStatus.CONFIRMED);
+        if (delivery != null) {
+            confirmedOrder.setDeliveryDetails(delivery);
+        }
 
         items.clear();
         flightBookings.clear();

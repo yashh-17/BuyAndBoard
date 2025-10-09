@@ -47,7 +47,9 @@ public class Event {
     public void setOrigin(String origin) { this.origin = origin; }
 
     public String getDestination() { return destination; }
-    public void setDestination(String destination) { this.destination = destination; }
+    public double getPrice() {
+        return basePrice;
+    }
 
     public LocalDateTime getDepartureTime() { return departureTime; }
     public void setDepartureTime(LocalDateTime departureTime) { this.departureTime = departureTime; }
