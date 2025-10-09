@@ -17,6 +17,54 @@ public class BookingHandler {
         this.isRoundTrip = false;
     }
 
+    // Grouped seat display and selection for a chosen flight
+    public String selectSeatForFlight(Event chosen) {
+        List<String> availableSeats = chosen.getAvailableSeats();
+        if (availableSeats.isEmpty()) {
+            System.out.println("⚠ No seats left on this flight!");
+            return null;
+        }
+        availableSeats.sort((a, b) -> Integer.compare(Integer.parseInt(a.substring(1)), Integer.parseInt(b.substring(1))));
+
+        // Group seats by type
+        List<String> middle = new ArrayList<>();
+        List<String> aisle = new ArrayList<>();
+        List<String> window = new ArrayList<>();
+        for (String s : availableSeats) {
+            char t = chosen.getSeatType(s);
+            String label = chosen.formatSeatWithType(s);
+            if (t == 'M') middle.add(label);
+            else if (t == 'A') aisle.add(label);
+            else window.add(label);
+        }
+
+        // Display grouped lists
+        if (!middle.isEmpty()) System.out.println("MIDDLE SEATS: " + String.join(" ", middle));
+        if (!aisle.isEmpty()) System.out.println("AISLE SEATS: " + String.join(" ", aisle));
+        if (!window.isEmpty()) System.out.println("WINDOW SEATS: " + String.join(" ", window));
+
+        String seat = "";
+        while (true) {
+            System.out.print("Enter Seat Number to Book: ");
+            seat = sc.nextLine().trim().toUpperCase();
+            if (availableSeats.contains(seat)) {
+                break;
+            } else {
+                System.out.println("❌ Invalid seat. Please choose from the displayed seats (e.g., S3).");
+            }
+        }
+
+        boolean booked = chosen.bookSeat(seat);
+        if (booked) {
+            System.out.println("✅ Seat " + seat + " booked on flight " + chosen.getFlightId());
+            System.out.println("Remaining available seats: " + chosen.getRemainingSeats());
+            lastBookedSeat = seat;
+            return seat;
+        } else {
+            return null;
+        }
+    }
+
     public void displayFlights() {
         System.out.println("\n✈ AVAILABLE FLIGHTS ✈");
         for (Event f : flights) {
@@ -69,29 +117,10 @@ public class BookingHandler {
         }
 
         Event chosen = availableFlights.get(choice);
-        List<String> availableSeats = chosen.getAvailableSeats();
-        if (availableSeats.isEmpty()) {
-            System.out.println("⚠ No seats left on this flight!");
+        String seat = selectSeatForFlight(chosen);
+        if (seat == null) {
             return null;
         }
-        availableSeats.sort(null);
-        System.out.println("\nAvailable Seats: " + String.join(", ", availableSeats));
-
-        String seat = "";
-        while (true) {
-            System.out.print("Enter Seat Number to Book: ");
-            seat = sc.nextLine().trim().toUpperCase();
-            if (availableSeats.contains(seat)) {
-                break;
-            } else {
-                System.out.println("❌ Invalid seat. Please choose from available seats.");
-            }
-        }
-
-        chosen.bookSeat(seat);
-        System.out.println("✅ Seat " + seat + " booked on flight " + chosen.getFlightId());
-        lastBookedSeat = seat;
-
         return chosen;
     }
 

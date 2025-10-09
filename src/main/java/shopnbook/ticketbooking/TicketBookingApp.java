@@ -2,13 +2,9 @@ package shopnbook.ticketbooking;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 import java.util.Scanner;
-import shopnbook.ecommerce.EcommerceApp;
 import shopnbook.ecommerce.Cart;
-import shopnbook.ecommerce.User;
 import shopnbook.utils.CurrencyUtils;
 import shopnbook.utils.PurchaseCollector;
 
@@ -102,25 +98,12 @@ public class TicketBookingApp {
         }
 
         Event onwardFlight = onwardFlights.get(flightIndex);
-        String selectedFlightId = onwardFlight.getFlightId();
         double onwardPrice = handler.bookFlight(onwardFlight, passengerName);
 
-        List<String> availableSeats = Arrays.asList("S1", "S10", "S100", "S91", "S92", "S93", "S94", "S95", "S96", "S97", "S98", "S99");
-
-        // Sort seats numerically
-        Collections.sort(availableSeats, (a, b) -> {
-            int numA = Integer.parseInt(a.substring(1));
-            int numB = Integer.parseInt(b.substring(1));
-            return Integer.compare(numA, numB);
-        });
-
-        System.out.println("Available Seats (sorted):");
-        String selectedSeat = selectSeatWithPagination(availableSeats, sc);
-
-        if (selectedSeat != null && availableSeats.contains(selectedSeat)) {
-            onwardFlight.bookSeat(selectedSeat);
+        // Use grouped seat selection with case-insensitive handling; this books the seat and decrements availability
+        String selectedSeat = handler.selectSeatForFlight(onwardFlight);
+        if (selectedSeat != null) {
             cart.addFlightBooking(onwardFlight, passengerName, selectedSeat, onwardPrice);
-            System.out.println("✅ Seat " + selectedSeat + " booked on flight " + selectedFlightId);
             System.out.println("💰 Ticket Price: " + onwardFlight.getPrice());
         } else {
             System.out.println("❌ Invalid seat selection or no seat booked.");
@@ -136,6 +119,12 @@ public class TicketBookingApp {
             }
             returnFlight = handler.selectFlightAndSeat(returnFlights);
             returnPrice = handler.bookFlight(returnFlight, passengerName);
+            if (returnFlight != null) {
+                String returnSeat = handler.getLastBookedSeat();
+                if (returnSeat != null) {
+                    cart.addFlightBooking(returnFlight, passengerName, returnSeat, returnPrice);
+                }
+            }
         }
 
         double totalAmount = onwardPrice + returnPrice;
@@ -160,38 +149,5 @@ public class TicketBookingApp {
         System.out.println("📋 You can now 'Place Order' from the main menu to pay for everything!");
     }
 
-    private static String selectSeatWithPagination(List<String> seats, Scanner sc) {
-        final int SEATS_PER_PAGE = 10;
-        int page = 0;
-        while (page * SEATS_PER_PAGE < seats.size()) {
-            int start = page * SEATS_PER_PAGE;
-            int end = Math.min(start + SEATS_PER_PAGE, seats.size());
-            System.out.println("\n--- Page " + (page + 1) + " ---");
-            for (int i = start; i < end; i++) {
-                System.out.print(seats.get(i) + " ");
-            }
-            System.out.println();
-            if (end < seats.size()) {
-                System.out.print("Enter seat or 'N' for next page: ");
-                String input = sc.nextLine().trim();
-                if (input.equalsIgnoreCase("N")) {
-                    page++;
-                } else if (seats.contains(input)) {
-                    return input;
-                } else {
-                    System.out.println("❌ Invalid seat. Try again or 'N' for next page.");
-                }
-            } else {
-                System.out.print("Enter seat: ");
-                String input = sc.nextLine().trim();
-                if (seats.contains(input)) {
-                    return input;
-                } else {
-                    System.out.println("❌ Invalid seat.");
-                    return null;
-                }
-            }
-        }
-        return null;
-    }
+    // Pagination-based seat selection method removed in favor of grouped seat selection in BookingHandler
 }
