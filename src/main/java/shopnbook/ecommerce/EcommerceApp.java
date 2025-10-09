@@ -1,15 +1,6 @@
 package shopnbook.ecommerce;
 
-import shopnbook.ecommerce.InvoiceGenerator;
-import shopnbook.ecommerce.DeliveryService;
 import shopnbook.utils.PurchaseCollector;
-import shopnbook.ecommerce.User;
-import shopnbook.ecommerce.Product;
-import shopnbook.ecommerce.ProductCatalog;
-import shopnbook.ecommerce.Cart;
-import shopnbook.ecommerce.DeliveryDetails;
-import shopnbook.ecommerce.Order;
-import shopnbook.ecommerce.FlightBooking;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -56,9 +47,46 @@ public class EcommerceApp {
 
                     if (confirmation.equals("Y") || confirmation.equals("YES")) {
                         DeliveryDetails delivery = DeliveryService.promptDeliveryDetails(sc, cart, user);
+
+                        // Unified payment prompt (UPI)
+                        System.out.println("\nSelect Payment Method:");
+                        System.out.println("1. UPI");
+                        System.out.print("Enter choice: ");
+                        String pmChoice = sc.next().trim();
+                        if (!pmChoice.equals("1")) {
+                            System.out.println("Unsupported payment method. Cancelling.");
+                            break;
+                        }
+
+                        sc.nextLine(); // consume endline
+                        String upiId;
+                        while (true) {
+                            System.out.print("Enter your UPI ID (e.g., name@bank): ");
+                            upiId = sc.nextLine().trim();
+                            if (isValidUpiId(upiId)) break;
+                            System.out.println("❌ Invalid UPI ID. Please use format like 'name@bank'.");
+                        }
+
+                        double amount = PurchaseCollector.getInstance().getTotalCartValue();
+                        System.out.println("\n✅ Payment request sent to your UPI app. Please check your phone and approve the payment.");
+
+                        shopnbook.payment.UpiPaymentService upi = new shopnbook.payment.UpiPaymentService();
+                        shopnbook.payment.PaymentResult result = upi.pay(amount, upiId);
+                        if (result.getStatus() != shopnbook.payment.PaymentStatus.SUCCESS) {
+                            System.out.println("❌ Payment failed via UPI. Please try again later.");
+                            break;
+                        }
+
+                        System.out.println("✅ Payment successful via UPI!");
+
                         Order order = cart.placeOrder(delivery);
                         if (order != null) {
+                            order.setPaymentMethod(shopnbook.payment.PaymentMethod.UPI);
+                            order.setPaymentStatus(shopnbook.payment.PaymentStatus.SUCCESS);
+                            order.setTransactionId(result.getTransactionId());
+                            order.setPaidAt(java.time.LocalDateTime.now());
                             System.out.println("Order placed successfully!");
+                            System.out.println("Your tickets have been booked successfully and will be sent to your registered email.");
                         }
                     } else {
                         System.out.println("Order cancelled. You can continue shopping.");
@@ -72,6 +100,7 @@ public class EcommerceApp {
             }
         }
     }
+    //
 
     private static void browseByCategory(Scanner sc, Cart cart) {
         List<Product> all = ProductCatalog.getAllProducts();
@@ -363,5 +392,16 @@ public class EcommerceApp {
         }
         return sc.nextInt();
     }
-}
 
+    // Basic UPI ID validation: something@provider
+    private static boolean isValidUpiId(String upiId) {
+        if (upiId == null) return false;
+        String trimmed = upiId.trim();
+        if (trimmed.length() < 5) return false;
+        int at = trimmed.indexOf('@');
+        if (at <= 0 || at == trimmed.length() - 1) return false;
+        String name = trimmed.substring(0, at);
+        String provider = trimmed.substring(at + 1);
+        return name.matches("[A-Za-z0-9._-]{2,}") && provider.matches("[A-Za-z]{2,}");
+    }
+}

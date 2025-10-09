@@ -1,6 +1,9 @@
 package shopnbook.ecommerce;
 
 import shopnbook.utils.CurrencyUtils;
+import shopnbook.payment.PaymentMethod;
+import shopnbook.payment.PaymentStatus;
+import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -19,6 +22,11 @@ public class Order {
     private double total;
     private OrderStatus status;
     private DeliveryDetails deliveryDetails;
+    // Payment details
+    private PaymentMethod paymentMethod;
+    private PaymentStatus paymentStatus;
+    private String transactionId;
+    private LocalDateTime paidAt;
 
     public Order(Map<Product, Integer> items, double total) {
         this(items, new ArrayList<>(), total);
@@ -64,6 +72,18 @@ public class Order {
         this.deliveryDetails = deliveryDetails;
     }
 
+    public PaymentMethod getPaymentMethod() { return paymentMethod; }
+    public void setPaymentMethod(PaymentMethod paymentMethod) { this.paymentMethod = paymentMethod; }
+
+    public PaymentStatus getPaymentStatus() { return paymentStatus; }
+    public void setPaymentStatus(PaymentStatus paymentStatus) { this.paymentStatus = paymentStatus; }
+
+    public String getTransactionId() { return transactionId; }
+    public void setTransactionId(String transactionId) { this.transactionId = transactionId; }
+
+    public LocalDateTime getPaidAt() { return paidAt; }
+    public void setPaidAt(LocalDateTime paidAt) { this.paidAt = paidAt; }
+
     public double getEcomSubtotal() {
         double total = 0.0;
         for (Map.Entry<Product, Integer> entry : items.entrySet()) {
@@ -108,6 +128,11 @@ public class Order {
         }
 
         sb.append("Total: ").append(CurrencyUtils.formatPrice(total));
+        if (paymentMethod != null) {
+            sb.append("\nPaid via ").append(paymentMethod.name());
+            if (transactionId != null) sb.append(" (Txn: ").append(transactionId).append(")");
+            if (paidAt != null) sb.append(" at ").append(paidAt);
+        }
         return sb.toString();
     }
 }
