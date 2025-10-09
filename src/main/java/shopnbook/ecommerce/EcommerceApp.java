@@ -100,6 +100,7 @@ public class EcommerceApp {
             }
         }
     }
+    //
 
     private static void browseByCategory(Scanner sc, Cart cart) {
         List<Product> all = ProductCatalog.getAllProducts();
