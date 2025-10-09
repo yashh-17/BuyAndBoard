@@ -78,7 +78,8 @@ public class PurchaseCollector {
     public double getTotalEcommerceValue() {
         return orders.stream()
             .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED)
-            .mapToDouble(Order::getTotal).sum();
+            .mapToDouble(Order::getEcomSubtotal)
+            .sum();
     }
 
     public double getTotalCartValue() {
@@ -88,7 +89,11 @@ public class PurchaseCollector {
     }
 
     public double getTotalTicketValue() {
-        return tickets.stream().mapToDouble(Ticket::getPricePaid).sum();
+        // Sum flight subtotals from confirmed orders
+        return orders.stream()
+            .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED)
+            .mapToDouble(Order::getFlightSubtotal)
+            .sum();
     }
 
     public double getTotalWorth() {
@@ -142,20 +147,20 @@ public class PurchaseCollector {
         System.out.printf("║ Session Start: %-" + (BOX_WIDTH - 17) + "s ║%n", sessionStart);
         System.out.println("╚" + repeatChar('═', BOX_WIDTH - 2) + "╝");
 
-        // Confirmed E-commerce Orders Section
-        List<Order> confirmedOrders = orders.stream()
-            .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED)
+        // Confirmed E-commerce Orders Section (only orders with products)
+        List<Order> confirmedOrdersEcom = orders.stream()
+            .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED && !order.getItems().isEmpty())
             .toList();
 
-        if (!confirmedOrders.isEmpty()) {
+        if (!confirmedOrdersEcom.isEmpty()) {
             System.out.println("\n📦 CONFIRMED E-COMMERCE ORDERS:");
             printAlignedTable(
                 List.of("#", "Order ID", "Items", "Total"),
-                confirmedOrders.stream().map(order -> List.of(
-                    String.valueOf(confirmedOrders.indexOf(order) + 1),
+                confirmedOrdersEcom.stream().map(order -> List.of(
+                    String.valueOf(confirmedOrdersEcom.indexOf(order) + 1),
                     "Order #" + order.getOrderId(),
                     String.valueOf(order.getItems().values().stream().mapToInt(Integer::intValue).sum()),
-                    CurrencyUtils.formatPrice(order.getTotal())
+                    CurrencyUtils.formatPrice(order.getEcomSubtotal())
                 )).toList(),
                 List.of(4, 16, 8, 12)
             );
@@ -171,16 +176,28 @@ public class PurchaseCollector {
             );
         }
 
-        if (!tickets.isEmpty()) {
-            System.out.println("\n✈️  FLIGHT TICKETS:");
+        // Confirmed Flight Tickets Section (aggregate from confirmed orders' flight bookings)
+        List<Order> confirmedOrdersWithFlights = orders.stream()
+            .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED && !order.getFlightBookings().isEmpty())
+            .toList();
+
+        if (!confirmedOrdersWithFlights.isEmpty()) {
+            System.out.println("\n✈️  CONFIRMED FLIGHT TICKETS:");
+            List<List<String>> rows = new ArrayList<>();
+            int idx = 1;
+            for (Order order : confirmedOrdersWithFlights) {
+                for (var booking : order.getFlightBookings()) {
+                    rows.add(List.of(
+                        String.valueOf(idx++),
+                        booking.getFlight().getFlightId(),
+                        booking.getFlight().getOrigin() + "-" + booking.getFlight().getDestination(),
+                        CurrencyUtils.formatPrice(booking.getPrice())
+                    ));
+                }
+            }
             printAlignedTable(
                 List.of("#", "Flight", "Route", "Price"),
-                tickets.stream().map(ticket -> List.of(
-                    String.valueOf(tickets.indexOf(ticket) + 1),
-                    ticket.getFlight().getFlightId(),
-                    ticket.getFlight().getOrigin() + "-" + ticket.getFlight().getDestination(),
-                    CurrencyUtils.formatPrice(ticket.getPricePaid())
-                )).toList(),
+                rows,
                 List.of(4, 16, 20, 12)
             );
         }
@@ -197,7 +214,7 @@ public class PurchaseCollector {
             List.of(37, 13)
         );
 
-        if (confirmedOrders.isEmpty() && tickets.isEmpty() && pendingValue == 0) {
+        if (confirmedOrdersEcom.isEmpty() && confirmedOrdersWithFlights.isEmpty() && pendingValue == 0) {
             System.out.println("\n📭 No purchases recorded in this session yet.");
             System.out.println("   Start shopping or booking flights to see your summary!");
         }

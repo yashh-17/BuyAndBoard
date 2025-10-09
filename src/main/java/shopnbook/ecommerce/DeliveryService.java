@@ -17,21 +17,17 @@ public class DeliveryService {
             System.out.println("\n📦 DELIVERY DETAILS (for E-commerce items)");
             System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-            String defaultName = user.getName();
-            System.out.print("Name (default: " + defaultName + "): ");
-            String name = sc.nextLine().trim();
-            if (name.isEmpty()) name = defaultName;
-
-            String street = getValidatedInput(sc, "Street Address");
+            String street = getValidatedInput(sc, "Street");
+            System.out.print("Village (optional): ");
+            String village = sc.nextLine().trim();
+            if (village.isEmpty()) village = null;
             String city = getValidatedInput(sc, "City");
-            String postalCode = getValidatedPostalCode(sc);
+            String state = getValidatedInput(sc, "State");
+            String pin = getValidatedPinCode(sc);
             String country = getValidatedInput(sc, "Country");
+            String phone = getValidatedPhone(sc);
 
-            System.out.print("Contact Number (optional, press Enter to skip): ");
-            String contact = sc.nextLine().trim();
-            if (contact.isEmpty()) contact = null;
-
-            return new DeliveryDetails(name, street, city, postalCode, country, contact);
+            return new DeliveryDetails(street, village, city, state, pin, country, phone);
         }
 
         return null;
@@ -46,14 +42,25 @@ public class DeliveryService {
         }
     }
 
-    private static String getValidatedPostalCode(Scanner sc) {
+    private static String getValidatedPinCode(Scanner sc) {
         while (true) {
-            System.out.print("Postal Code: ");
+            System.out.print("Pin Code: ");
             String input = sc.nextLine().trim();
             if (input.matches("\\d{5,6}")) {
                 return input;
             }
-            System.out.println("❌ Invalid postal code. Please enter 5-6 digits.");
+            System.out.println("❌ Invalid pin code. Please enter 5-6 digits.");
+        }
+    }
+
+    private static String getValidatedPhone(Scanner sc) {
+        while (true) {
+            System.out.print("Phone Number (10 digits): ");
+            String input = sc.nextLine().trim();
+            if (input.matches("\\d{10}")) {
+                return input;
+            }
+            System.out.println("❌ Invalid phone number. Please enter exactly 10 digits.");
         }
     }
 }

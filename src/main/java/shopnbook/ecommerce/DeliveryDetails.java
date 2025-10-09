@@ -1,48 +1,54 @@
 package shopnbook.ecommerce;
 
 public class DeliveryDetails {
-    private String name;
     private String street;
+    private String village;
     private String city;
-    private String postalCode;
+    private String state;
+    private String pinCode;
     private String country;
-    private String contactNumber;
+    private String phone;
 
-    public DeliveryDetails(String name, String street, String city, String postalCode, String country, String contactNumber) {
-        this.name = name;
+    public DeliveryDetails(String street, String village, String city, String state, String pinCode, String country, String phone) {
         this.street = street;
+        this.village = (village != null && !village.trim().isEmpty()) ? village.trim() : null;
         this.city = city;
-        this.postalCode = postalCode;
+        this.state = state;
+        this.pinCode = pinCode;
         this.country = country;
-        this.contactNumber = contactNumber;
+        this.phone = phone;
     }
 
     // Getters
-    public String getName() { return name; }
     public String getStreet() { return street; }
+    public String getVillage() { return village; }
     public String getCity() { return city; }
-    public String getPostalCode() { return postalCode; }
+    public String getState() { return state; }
+    public String getPinCode() { return pinCode; }
     public String getCountry() { return country; }
-    public String getContactNumber() { return contactNumber; }
+    public String getPhone() { return phone; }
 
-    // Setters (if needed for updates)
-    public void setName(String name) { this.name = name; }
+    // Setters
     public void setStreet(String street) { this.street = street; }
+    public void setVillage(String village) { this.village = (village != null && !village.trim().isEmpty()) ? village.trim() : null; }
     public void setCity(String city) { this.city = city; }
-    public void setPostalCode(String postalCode) { this.postalCode = postalCode; }
+    public void setState(String state) { this.state = state; }
+    public void setPinCode(String pinCode) { this.pinCode = pinCode; }
     public void setCountry(String country) { this.country = country; }
-    public void setContactNumber(String contactNumber) { this.contactNumber = contactNumber; }
+    public void setPhone(String phone) { this.phone = phone; }
 
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append(name).append(", ");
-        sb.append(street).append(", ");
-        sb.append(city).append(" ").append(postalCode).append(", ");
-        sb.append(country);
-        if (contactNumber != null && !contactNumber.isEmpty()) {
-            sb.append(" (Contact: ").append(contactNumber).append(")");
+        sb.append(street);
+        if (village != null && !village.isEmpty()) {
+            sb.append(", ").append(village);
         }
+        sb.append(", ").append(city)
+          .append(", ").append(state)
+          .append(" - ").append(pinCode)
+          .append(", ").append(country)
+          .append(" (Phone: ").append(phone).append(")");
         return sb.toString();
     }
 }

@@ -151,10 +151,8 @@ public class TicketBookingApp {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
 
-        cart.addFlightBooking(onwardFlight, passengerName, onwardFlight.getLastBookedSeat(), onwardPrice);
-        if (isRoundTrip && returnFlight != null) {
-            cart.addFlightBooking(returnFlight, passengerName, returnFlight.getLastBookedSeat(), returnPrice);
-        }
+        // Note: Flights were already added to cart immediately after seat selection.
+        // Avoid adding them again to prevent duplicates.
 
         System.out.println("\n✅ FLIGHTS ADDED TO CART!");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
