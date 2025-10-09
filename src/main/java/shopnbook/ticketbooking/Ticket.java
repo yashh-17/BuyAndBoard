@@ -5,18 +5,16 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
-// Model class for a booked ticket
 public class Ticket {
     private String ticketId;
     private String passengerName;
     private String seatNumber;
-    private double pricePaid;  // keep field name same to avoid breaking other code
+    private double pricePaid;
     private LocalDateTime bookingTime;
     private Event flight;
 
-    // Constructor
     public Ticket(Event flight, String passengerName, String seatNumber, double pricePaid) {
-        this.ticketId = UUID.randomUUID().toString().substring(0, 8); // short unique ID
+        this.ticketId = UUID.randomUUID().toString().substring(0, 8);
         this.flight = flight;
         this.passengerName = passengerName;
         this.seatNumber = seatNumber;
@@ -24,7 +22,6 @@ public class Ticket {
         this.bookingTime = LocalDateTime.now();
     }
 
-    // Getters
     public String getTicketId() { return ticketId; }
     public String getPassengerName() { return passengerName; }
     public String getSeatNumber() { return seatNumber; }
@@ -47,9 +44,6 @@ public class Ticket {
         );
     }
 
-    // ==============================
-    // 🚀 Improved Helper for Round-Trip
-    // ==============================
     public static void printRoundTrip(List<Ticket> tickets) {
         if (tickets == null || tickets.size() < 2) {
             System.out.println("⚠ Not enough tickets for round-trip printing.");
@@ -90,10 +84,8 @@ public class Ticket {
             }
         }
 
-        // Calculate total price
         double total = tickets.stream().mapToDouble(Ticket::getPricePaid).sum();
         System.out.printf("Total Price: %s\n", CurrencyUtils.formatPrice(total));
-
         System.out.println("----------------------------");
     }
 }

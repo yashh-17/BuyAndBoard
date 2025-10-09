@@ -15,11 +15,9 @@ public class TicketBookingApp {
     public static void start(String currentUsername) {
         System.out.println("Welcome to Ticket Booking!");
 
-        // Get shared cart from PurchaseCollector
         Cart cart = PurchaseCollector.getInstance().getCurrentCart();
         Scanner sc = new Scanner(System.in);
 
-        // 1. Create sample flights
         List<Event> flights = new ArrayList<>();
         flights.add(new Event("AI100", "Air India", "Vizag", "Ganavaram",
                 LocalDateTime.of(2025, 9, 20, 6, 0), "1h 15m", 2500.0, 100));
@@ -75,10 +73,8 @@ public class TicketBookingApp {
         }
         boolean isRoundTrip = (journeyChoice == 2);
 
-        // 4. Take passenger name
         String passenger = handler.takePassengerInput();
 
-        // 5. Onward journey
         System.out.print("\nEnter Origin: ");
         String origin = sc.nextLine().trim();
         System.out.print("Enter destination: ");
@@ -92,7 +88,6 @@ public class TicketBookingApp {
         Event onwardFlight = handler.selectFlightAndSeat(onwardFlights);
         double onwardPrice = handler.bookFlight(onwardFlight, passenger);
 
-        // 6. Return journey if round-trip
         Event returnFlight = null;
         double returnPrice = 0;
         if (isRoundTrip) {
@@ -106,7 +101,6 @@ public class TicketBookingApp {
             returnPrice = handler.bookFlight(returnFlight, passenger);
         }
 
-        // 7. Calculate total amount and add to cart (NO immediate payment)
         double totalAmount = onwardPrice + returnPrice;
 
         System.out.println("\n💰 FLIGHT BOOKING SUMMARY");
@@ -120,7 +114,6 @@ public class TicketBookingApp {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
 
-        // Add flights to cart instead of immediate payment
         cart.addFlightBooking(onwardFlight, passenger, onwardFlight.getLastBookedSeat(), onwardPrice);
         if (isRoundTrip && returnFlight != null) {
             cart.addFlightBooking(returnFlight, passenger, returnFlight.getLastBookedSeat(), returnPrice);

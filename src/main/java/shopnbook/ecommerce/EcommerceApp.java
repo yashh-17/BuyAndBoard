@@ -12,11 +12,8 @@ import java.util.Set;
 public class EcommerceApp {
     public static void start() {
         System.out.println("Welcome to E-Commerce Shopping!");
-        // Initialize user and catalog
         User user = new User("Alice", 2000.00);
         ProductCatalog.loadSampleProducts();
-
-        // Get shared cart from PurchaseCollector
         Cart cart = PurchaseCollector.getInstance().getCurrentCart();
         Scanner sc = new Scanner(System.in);
 
@@ -42,22 +39,15 @@ public class EcommerceApp {
                         System.out.println("Your cart is empty. Add some items first!");
                         break;
                     }
-
-                    // Show cart details
                     System.out.println("\n🛒 ORDER CONFIRMATION");
                     System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
                     cart.viewCart();
-
-                    // Show purchase summary
                     System.out.println("\n📋 CURRENT PURCHASE SUMMARY:");
                     PurchaseCollector.getInstance().displayPurchaseSummary();
-
-                    // Ask for confirmation
                     System.out.println("\n❓ Proceed to payment? (Y/N): ");
                     String confirmation = sc.next().trim().toUpperCase();
 
                     if (confirmation.equals("Y") || confirmation.equals("YES")) {
-                        // Proceed to payment
                         boolean paymentSuccess = processPayment(sc, cart, user);
                         if (paymentSuccess) {
                             Order order = cart.placeOrder();
@@ -88,7 +78,6 @@ public class EcommerceApp {
             return;
         }
 
-        // Build unique category list preserving insertion order
         Set<String> categories = new LinkedHashSet<>();
         for (Product p : all) {
             if (p.getCategory() != null) categories.add(p.getCategory());
@@ -143,19 +132,17 @@ public class EcommerceApp {
     }
 
     public static boolean processPayment(Scanner sc, Cart cart, User user) {
-        return processPayment(sc, cart, user, -1.0); // Use -1 as default for backward compatibility
+        return processPayment(sc, cart, user, -1.0);
     }
 
     public static boolean processPayment(Scanner sc, Cart cart, User user, double amount) {
         double total = 0.0;
 
         if (cart != null) {
-            // Calculate from cart (e-commerce scenario)
             for (Map.Entry<Product, Integer> entry : cart.getItems().entrySet()) {
                 total += entry.getKey().getPrice() * entry.getValue();
             }
         } else if (amount > 0) {
-            // Use provided amount (flight booking scenario)
             total = amount;
         } else {
             System.out.println("❌ Invalid payment configuration.");
@@ -215,10 +202,9 @@ public class EcommerceApp {
             return false;
         }
 
-        // Simulate payment processing
         System.out.println("🔄 Processing card payment...");
         try {
-            Thread.sleep(2000); // Simulate processing time
+            Thread.sleep(2000);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }
@@ -239,10 +225,9 @@ public class EcommerceApp {
             return false;
         }
 
-        // Simulate UPI payment processing
         System.out.println("🔄 Processing UPI payment...");
         try {
-            Thread.sleep(1500); // Simulate processing time
+            Thread.sleep(1500);
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
         }

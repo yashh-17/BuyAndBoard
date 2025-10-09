@@ -5,24 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-// Main booking logic controller
 public class BookingHandler {
-    private List<Event> flights; // List of all available flights
+    private List<Event> flights;
     private Scanner sc;
-
-    // Store the last booked seat
     private String lastBookedSeat;
-
-    // Round-trip flag
     private boolean isRoundTrip;
 
     public BookingHandler(List<Event> flights) {
         this.flights = flights;
         this.sc = new Scanner(System.in);
-        this.isRoundTrip = false; // default
+        this.isRoundTrip = false;
     }
 
-    // Display flights
     public void displayFlights() {
         System.out.println("\n✈ AVAILABLE FLIGHTS ✈");
         for (Event f : flights) {
@@ -30,7 +24,6 @@ public class BookingHandler {
         }
     }
 
-    // Filter flights by origin and destination
     public List<Event> filterFlights(String origin, String destination) {
         List<Event> result = new ArrayList<>();
         for (Event f : flights) {
@@ -42,20 +35,17 @@ public class BookingHandler {
         return result;
     }
 
-    // Take passenger input (just name for now)
     public String takePassengerInput() {
         System.out.println("\nEnter Passenger Name:");
         return sc.nextLine();
     }
 
-    // Select flight and seat
     public Event selectFlightAndSeat(List<Event> availableFlights) {
         if (availableFlights.isEmpty()) {
             System.out.println("⚠ No flights available for given filter.");
             return null;
         }
 
-        // Display flights with index
         System.out.println("\nSelect Flight by Index:");
         for (int i = 0; i < availableFlights.size(); i++) {
             System.out.println(i + ". " + availableFlights.get(i));
@@ -66,7 +56,7 @@ public class BookingHandler {
             System.out.print("Enter flight index: ");
             if (sc.hasNextInt()) {
                 choice = sc.nextInt();
-                sc.nextLine(); // consume newline
+                sc.nextLine();
                 if (choice >= 0 && choice < availableFlights.size()) {
                     break;
                 } else {
@@ -74,66 +64,52 @@ public class BookingHandler {
                 }
             } else {
                 System.out.println("❌ Invalid input. Please enter a number.");
-                sc.nextLine(); // discard invalid input
+                sc.nextLine();
             }
         }
 
         Event chosen = availableFlights.get(choice);
-
-        // Show available seats in sorted order
         List<String> availableSeats = chosen.getAvailableSeats();
         if (availableSeats.isEmpty()) {
             System.out.println("⚠ No seats left on this flight!");
             return null;
         }
-        availableSeats.sort(null); // sort alphabetically
+        availableSeats.sort(null);
         System.out.println("\nAvailable Seats: " + String.join(", ", availableSeats));
 
-        // Prompt user to select a seat
         String seat = "";
         while (true) {
             System.out.print("Enter Seat Number to Book: ");
-            seat = sc.nextLine().trim().toUpperCase(); // normalize input
+            seat = sc.nextLine().trim().toUpperCase();
             if (availableSeats.contains(seat)) {
-                break; // valid seat
+                break;
             } else {
                 System.out.println("❌ Invalid seat. Please choose from available seats.");
             }
         }
 
-        // Book the seat
         chosen.bookSeat(seat);
         System.out.println("✅ Seat " + seat + " booked on flight " + chosen.getFlightId());
-
-        // Store the seat internally to use in ticket generation
         lastBookedSeat = seat;
 
         return chosen;
     }
 
-    // Direct booking without discount
     public double bookFlight(Event chosen, String passengerName) {
         if (chosen == null) return 0;
-
         double price = chosen.getBasePrice();
         System.out.println("💰 Ticket Price: " + price);
         return price;
     }
 
-    // Generate and print ticket
     public void generateAndPrintTicket(Event flight, String passengerName, String seat, double price) {
         if (flight == null) return;
-
         Ticket ticket = new Ticket(flight, passengerName, seat, price);
-
-        // Report ticket to purchase collector
         PurchaseCollector.getInstance().addTicket(ticket);
-
         System.out.println("\n🎟 TICKET DETAILS 🎟");
         System.out.println(ticket);
     }
 
-    // Get last booked seat
     public String getLastBookedSeat() {
         return lastBookedSeat;
     }

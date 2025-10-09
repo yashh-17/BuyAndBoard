@@ -35,13 +35,13 @@ public class PurchaseCollector {
         this.currentUser = username;
         this.orders.clear();
         this.tickets.clear();
-        this.currentCart = null; // Will be created when needed
+        this.currentCart = null; 
         this.sessionStart = LocalDateTime.now();
     }
 
     public Cart getCurrentCart() {
         if (currentCart == null) {
-            User user = new User(currentUser, 10000.0); // Default wallet balance
+            User user = new User(currentUser, 10000.0); 
             currentCart = new Cart(user);
         }
         return currentCart;
@@ -111,9 +111,6 @@ public class PurchaseCollector {
         return sessionStart;
     }
 
-    /**
-     * Centers text within a given width by adding spaces on both sides
-     */
     private String centerText(String text, int width) {
         if (text.length() >= width) {
             return text.substring(0, width);
@@ -122,9 +119,6 @@ public class PurchaseCollector {
         return repeatChar(' ', padding) + text + repeatChar(' ', width - text.length() - padding);
     }
 
-    /**
-     * Repeats a character n times (Java 8+ compatible)
-     */
     private String repeatChar(char ch, int n) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n; i++) {
@@ -167,7 +161,6 @@ public class PurchaseCollector {
             );
         }
 
-        // Pending Orders Section (Current Cart)
         double pendingValue = getTotalCartValue();
         if (pendingValue > 0) {
             System.out.println("\n🛒 CURRENT CART:");
@@ -178,7 +171,6 @@ public class PurchaseCollector {
             );
         }
 
-        // Flight Tickets Section
         if (!tickets.isEmpty()) {
             System.out.println("\n✈️  FLIGHT TICKETS:");
             printAlignedTable(
@@ -193,7 +185,6 @@ public class PurchaseCollector {
             );
         }
 
-        // Summary Totals
         System.out.println("\n💰 FINANCIAL SUMMARY:");
         printAlignedTable(
             List.of("Description", "Amount"),
@@ -211,14 +202,8 @@ public class PurchaseCollector {
         }
     }
 
-    /**
-     * Creates a perfectly aligned table with consistent formatting
-     * @param headers Column headers
-     * @param rows Table data rows
-     * @param columnWidths Width for each column (including padding)
-     */
+
     private void printAlignedTable(List<String> headers, List<List<String>> rows, List<Integer> columnWidths) {
-        // Create table borders
         StringBuilder topBorder = new StringBuilder("┌");
         StringBuilder headerSeparator = new StringBuilder("├");
         StringBuilder bottomBorder = new StringBuilder("└");
@@ -240,28 +225,23 @@ public class PurchaseCollector {
         headerSeparator.append("┤");
         bottomBorder.append("┘");
 
-        // Print table
         System.out.println(topBorder);
 
-        // Print headers
         System.out.print("│");
         for (int i = 0; i < headers.size(); i++) {
             System.out.printf(" %-" + (columnWidths.get(i) - 2) + "s │", headers.get(i));
         }
         System.out.println();
 
-        // Print separator (only if there are data rows)
         if (!rows.isEmpty()) {
             System.out.println(headerSeparator);
         }
 
-        // Print data rows
         for (List<String> row : rows) {
             System.out.print("│");
             for (int i = 0; i < row.size(); i++) {
                 String value = row.get(i);
                 int width = columnWidths.get(i);
-                // Right-align currency amounts and numbers, left-align text
                 if (value.matches(".*₹.*") || value.matches("\\d+")) {
                     System.out.printf(" %" + (width - 2) + "s │", value);
                 } else {
@@ -271,7 +251,6 @@ public class PurchaseCollector {
             System.out.println();
         }
 
-        // Print bottom border
         System.out.println(bottomBorder);
     }
 }

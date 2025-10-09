@@ -61,24 +61,18 @@ public class AppMain {
             return;
         }
 
-        // Show cart details
         System.out.println("\n🛒 ORDER CONFIRMATION");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         cart.viewCart();
 
-        // Show purchase summary
         System.out.println("\n📋 CURRENT PURCHASE SUMMARY:");
         PurchaseCollector.getInstance().displayPurchaseSummary();
 
-        // Ask for confirmation
         System.out.println("\n❓ Proceed to payment? (Y/N): ");
         String confirmation = sc.next().trim().toUpperCase();
 
         if (confirmation.equals("Y") || confirmation.equals("YES")) {
-            // Get user for payment
             User user = cart.getUser();
-
-            // Proceed to payment
             boolean paymentSuccess = EcommerceApp.processPayment(sc, cart, user);
             if (paymentSuccess) {
                 Order order = cart.placeOrder();

@@ -33,7 +33,6 @@ public class Cart {
         items.put(product, items.getOrDefault(product, 0) + qty);
         System.out.println(product.getName() + " added to cart x" + qty);
 
-        // Create a pending order for cart tracking
         createPendingOrder();
     }
 
@@ -42,13 +41,11 @@ public class Cart {
         flightBookings.add(booking);
         System.out.println("✅ Flight " + flight.getFlightId() + " added to cart for " + passenger);
 
-        // Create a pending order for cart tracking
         createPendingOrder();
     }
 
     private void createPendingOrder() {
         if (items.isEmpty() && flightBookings.isEmpty()) {
-            // Remove any existing pending order if cart is empty
             PurchaseCollector.getInstance().clearPendingOrders();
             return;
         }
@@ -62,7 +59,6 @@ public class Cart {
             total += booking.getPrice();
         }
 
-        // Create pending order with current cart items and flights
         Map<Product, Integer> productSnapshot = new LinkedHashMap<>(items);
         List<FlightBooking> flightSnapshot = new ArrayList<>(flightBookings);
 
@@ -71,7 +67,6 @@ public class Cart {
 
         PurchaseCollector collector = PurchaseCollector.getInstance();
 
-        // Remove any existing pending order and add the updated one
         collector.clearPendingOrders();
         collector.addOrder(pendingOrder);
     }
@@ -79,13 +74,13 @@ public class Cart {
     public void removeFromCart(Product product) {
         items.remove(product);
         System.out.println(product.getName() + " removed from cart");
-        createPendingOrder(); // Update pending order after removal
+        createPendingOrder();
     }
 
     public void removeFlightBooking(Event flight) {
         flightBookings.removeIf(booking -> booking.getFlight().equals(flight));
         System.out.println("Flight " + flight.getFlightId() + " removed from cart");
-        createPendingOrder(); // Update pending order after removal
+        createPendingOrder(); 
     }
 
     public void viewCart() {
@@ -112,7 +107,6 @@ public class Cart {
             }
         }
 
-        // Show Flight bookings
         if (!flightBookings.isEmpty()) {
             System.out.println("\n✈️ FLIGHT TICKETS:");
             for (FlightBooking booking : flightBookings) {
@@ -150,24 +144,20 @@ public class Cart {
             total += booking.getPrice();
         }
 
-        // Create CONFIRMED order with current cart items and flights (payment already processed)
         Map<Product, Integer> productSnapshot = new LinkedHashMap<>(items);
         List<FlightBooking> flightSnapshot = new ArrayList<>(flightBookings);
 
         Order confirmedOrder = new Order(productSnapshot, flightSnapshot, total);
         confirmedOrder.setStatus(Order.OrderStatus.CONFIRMED);
 
-        // Clear cart and update pending order (will be empty now)
         items.clear();
         flightBookings.clear();
-        createPendingOrder(); // This will remove the old pending order since cart is empty
-
+        createPendingOrder(); 
         System.out.println("✅ Order placed successfully: #" + confirmedOrder.getOrderId());
         System.out.println("   E-commerce: " + CurrencyUtils.formatPrice(getEcomTotal(productSnapshot)));
         System.out.println("   Flight Tickets: " + CurrencyUtils.formatPrice(getFlightTotal(flightSnapshot)));
         System.out.println("   Total Paid: " + CurrencyUtils.formatPrice(total));
 
-        // Add the confirmed order
         PurchaseCollector.getInstance().addOrder(confirmedOrder);
 
         return confirmedOrder;

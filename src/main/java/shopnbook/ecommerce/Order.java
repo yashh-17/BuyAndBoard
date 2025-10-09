@@ -25,11 +25,10 @@ public class Order {
 
     public Order(Map<Product, Integer> items, List<FlightBooking> flightBookings, double total) {
         this.orderId = nextId++;
-        // Create copies to prevent external modifications
         this.items = new LinkedHashMap<>(items);
         this.flightBookings = new ArrayList<>(flightBookings);
         this.total = total;
-        this.status = OrderStatus.CONFIRMED; // Default to confirmed for now
+        this.status = OrderStatus.CONFIRMED;
     }
 
     public int getOrderId() {
@@ -37,11 +36,11 @@ public class Order {
     }
 
     public Map<Product, Integer> getItems() {
-        return new LinkedHashMap<>(items); // Return a copy to prevent external modifications
+        return new LinkedHashMap<>(items);
     }
 
     public List<FlightBooking> getFlightBookings() {
-        return new ArrayList<>(flightBookings); // Return a copy to prevent external modifications
+        return new ArrayList<>(flightBookings);
     }
 
     public double getTotal() {
@@ -61,7 +60,6 @@ public class Order {
         StringBuilder sb = new StringBuilder();
         sb.append("Order #").append(orderId).append(" (").append(status).append(")\n");
 
-        // Show e-commerce items
         if (!items.isEmpty()) {
             sb.append("E-commerce Items:\n");
             for (Map.Entry<Product, Integer> entry : items.entrySet()) {
@@ -72,10 +70,9 @@ public class Order {
             }
         }
 
-        // Show flight bookings
         if (!flightBookings.isEmpty()) {
             if (!items.isEmpty()) {
-                sb.append("\n"); // Add spacing between sections
+                sb.append("\n");
             }
             sb.append("Flight Tickets:\n");
             for (FlightBooking booking : flightBookings) {
@@ -89,5 +86,3 @@ public class Order {
         return sb.toString();
     }
 }
-
-

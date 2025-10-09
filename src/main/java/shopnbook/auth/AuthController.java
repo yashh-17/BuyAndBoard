@@ -43,7 +43,6 @@ public class AuthController {
             return false;
         }
 
-        // Start new purchase collection session for authenticated user
         PurchaseCollector.getInstance().startNewSession(username);
         System.out.println("🛒 Session started for " + username);
 
