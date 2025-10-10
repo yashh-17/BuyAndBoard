@@ -145,7 +145,6 @@ public class PurchaseCollector {
         System.out.printf("║ Session Start: %-" + (BOX_WIDTH - 17) + "s ║%n", sessionStart);
         System.out.println("╚" + repeatChar('═', BOX_WIDTH - 2) + "╝");
 
-        // Confirmed E-commerce Orders Section (only orders with products)
         List<Order> confirmedOrdersEcom = orders.stream()
             .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED && !order.getItems().isEmpty())
             .toList();
@@ -174,7 +173,6 @@ public class PurchaseCollector {
             );
         }
 
-        // Confirmed Flight Tickets Section (aggregate from confirmed orders' flight bookings)
         List<Order> confirmedOrdersWithFlights = orders.stream()
             .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED && !order.getFlightBookings().isEmpty())
             .toList();
