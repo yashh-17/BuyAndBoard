@@ -34,32 +34,38 @@ public class DeliveryService {
     }
 
     private static String getValidatedInput(Scanner sc, String field) {
+        boolean firstAttempt = true; // consume a possible leftover newline silently
         while (true) {
             System.out.print(field + ": ");
             String input = sc.nextLine().trim();
             if (!input.isEmpty()) return input;
+            if (firstAttempt) { firstAttempt = false; continue; }
             System.out.println("❌ " + field + " cannot be empty. Please enter a value.");
         }
     }
 
     private static String getValidatedPinCode(Scanner sc) {
+        boolean firstAttempt = true;
         while (true) {
             System.out.print("Pin Code: ");
             String input = sc.nextLine().trim();
             if (input.matches("\\d{5,6}")) {
                 return input;
             }
+            if (firstAttempt && input.isEmpty()) { firstAttempt = false; continue; }
             System.out.println("❌ Invalid pin code. Please enter 5-6 digits.");
         }
     }
 
     private static String getValidatedPhone(Scanner sc) {
+        boolean firstAttempt = true;
         while (true) {
             System.out.print("Phone Number (10 digits): ");
             String input = sc.nextLine().trim();
             if (input.matches("\\d{10}")) {
                 return input;
             }
+            if (firstAttempt && input.isEmpty()) { firstAttempt = false; continue; }
             System.out.println("❌ Invalid phone number. Please enter exactly 10 digits.");
         }
     }
