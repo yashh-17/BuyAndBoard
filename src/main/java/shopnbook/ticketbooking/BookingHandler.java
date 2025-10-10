@@ -9,12 +9,10 @@ public class BookingHandler {
     private List<Event> flights;
     private Scanner sc;
     private String lastBookedSeat;
-    private boolean isRoundTrip;
 
     public BookingHandler(List<Event> flights) {
         this.flights = flights;
         this.sc = new Scanner(System.in);
-        this.isRoundTrip = false;
     }
 
     // Grouped seat display and selection for a chosen flight

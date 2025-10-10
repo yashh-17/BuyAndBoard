@@ -89,14 +89,11 @@ public class TicketBookingApp {
                 LocalDateTime.of(2025, 10, 17, 15, 0), "1h 10m", 2300.0, 100));
         flights.add(new Event("AI929", "Air India", "Gannavaram", "Hyderabad",
                 LocalDateTime.of(2025, 10, 18, 11, 0), "1h 15m", 2500.0, 100));
-        // 1. Display available flights
         
                 
 
-        // 2. Create booking handler
         BookingHandler handler = new BookingHandler(flights);
 
-        // 3. Select journey type
         System.out.println("\nSelect Journey Type:");
         System.out.println("1. One-way");
         System.out.println("2. Round-trip");
@@ -142,7 +139,6 @@ public class TicketBookingApp {
         Event onwardFlight = onwardFlights.get(flightIndex);
         double onwardPrice = handler.bookFlight(onwardFlight, passengerName);
 
-        // Use grouped seat selection with case-insensitive handling; this books the seat and decrements availability
         String selectedSeat = handler.selectSeatForFlight(onwardFlight);
         if (selectedSeat != null) {
             cart.addFlightBooking(onwardFlight, passengerName, selectedSeat, onwardPrice);
@@ -182,8 +178,6 @@ public class TicketBookingApp {
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
         System.out.println("Total Amount: " + CurrencyUtils.formatPrice(totalAmount));
 
-        // Note: Flights were already added to cart immediately after seat selection.
-        // Avoid adding them again to prevent duplicates.
 
         System.out.println("\n✅ FLIGHTS ADDED TO CART!");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
@@ -191,5 +185,4 @@ public class TicketBookingApp {
         System.out.println("📋 You can now 'Place Order' from the main menu to pay for everything!");
     }
 
-    // Pagination-based seat selection method removed in favor of grouped seat selection in BookingHandler
 }

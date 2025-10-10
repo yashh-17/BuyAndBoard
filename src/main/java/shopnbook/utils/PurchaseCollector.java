@@ -4,7 +4,6 @@ import shopnbook.ecommerce.Order;
 import shopnbook.ecommerce.Cart;
 import shopnbook.ecommerce.User;
 import shopnbook.ticketbooking.Ticket;
-import shopnbook.utils.CurrencyUtils;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -89,7 +88,6 @@ public class PurchaseCollector {
     }
 
     public double getTotalTicketValue() {
-        // Sum flight subtotals from confirmed orders
         return orders.stream()
             .filter(order -> order.getStatus() == Order.OrderStatus.CONFIRMED)
             .mapToDouble(Order::getFlightSubtotal)
