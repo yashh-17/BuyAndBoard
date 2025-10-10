@@ -1,7 +1,0 @@
-2
-john
-weakpass
-John
-Doe
-john@example.com
-1234567890

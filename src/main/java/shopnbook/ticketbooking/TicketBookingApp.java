@@ -17,13 +17,13 @@ public class TicketBookingApp {
         Scanner sc = new Scanner(System.in);
 
         List<Event> flights = new ArrayList<>();
-        flights.add(new Event("AI100", "Air India", "Vizag", "Ganavaram",
+        flights.add(new Event("AI100", "Air India", "Vizag", "Gannavaram",
                 LocalDateTime.of(2025, 9, 20, 6, 0), "1h 15m", 2500.0, 100));
         flights.add(new Event("6E200", "IndiGo", "Vizag", "Delhi",
                 LocalDateTime.of(2025, 9, 20, 7, 30), "3h 25m", 5500.0, 100));
-        flights.add(new Event("SG200", "SpiceJet", "Ganavaram", "Vizag",
+        flights.add(new Event("SG200", "SpiceJet", "Gannavaram", "Vizag",
                 LocalDateTime.of(2025, 9, 20, 9, 0), "1h 10m", 2300.0, 100));
-        flights.add(new Event("SG201", "SpiceJet", "Vizag", "Ganavaram",
+        flights.add(new Event("SG201", "SpiceJet", "Vizag", "Gannavaram",
                 LocalDateTime.of(2025, 9, 20, 11, 0), "1h 15m", 2500.0, 100));
         flights.add(new Event("AI101", "Air India", "Delhi", "Mumbai",
                 LocalDateTime.of(2025, 9, 20, 10, 30), "2h 15m", 4500.0, 100));
@@ -51,6 +51,48 @@ public class TicketBookingApp {
                 LocalDateTime.of(2025, 9, 30, 19, 0), "3h 20m", 5800.0, 100));
         flights.add(new Event("SG212", "SpiceJet", "Mumbai", "Delhi",
                 LocalDateTime.of(2025, 10, 1, 17, 30), "2h 15m", 4500.0, 200));
+        flights.add(new Event("AI313", "Air India", "Delhi", "Mumbai",
+                LocalDateTime.of(2025, 10, 2, 6, 0), "2h 10m", 4300.0, 150));
+        flights.add(new Event("6E414", "IndiGo", "Bangalore", "Mumbai",
+                LocalDateTime.of(2025, 10, 3, 20, 0), "2h 25m", 4600.0, 100));
+        flights.add(new Event("SG515", "SpiceJet", "Mumbai", "Bangalore",
+                LocalDateTime.of(2025, 10, 4, 15, 0), "2h 30m", 4800.0, 100));
+                flights.add(new Event("AI616", "Air India", "Chennai", "Delhi",
+                LocalDateTime.of(2025, 10, 5, 9, 0), "2h 55m", 5200.0, 150));
+        flights.add(new Event("6E717", "IndiGo", "Delhi", "Chennai",
+                LocalDateTime.of(2025, 10, 6, 14, 30), "2h 50m", 5000.0, 100));
+        flights.add(new Event("SG818", "SpiceJet", "Vizag", "Mumbai",
+                LocalDateTime.of(2025, 10, 7, 8, 0), "3h 15m", 5500.0, 100));
+        flights.add(new Event("AI919", "Air India", "Mumbai", "Vizag",
+                LocalDateTime.of(2025, 10, 8, 18, 0), "3h 10m", 5300.0, 100));
+                flights.add(new Event("6E020", "IndiGo", "Chennai", "Bangalore",
+                LocalDateTime.of(2025, 10, 9, 12, 0), "1h 30m", 3500.0, 100));
+        flights.add(new Event("SG121", "SpiceJet", "Bangalore", "Chennai",
+                LocalDateTime.of(2025, 10, 10, 16, 0), "1h 25m", 3300.0, 100));
+        flights.add(new Event("AI222", "Air India", "Hyderabad", "Bangolare",
+                LocalDateTime.of(2025, 10, 11, 7, 0), "1h 15m", 3400.0, 100));
+        flights.add(new Event("6E323", "IndiGo", "Bangalore", "Hyderabad",
+                LocalDateTime.of(2025, 10, 12, 19, 0), "1h 5m", 3200.0, 100));
+                flights.add(new Event("SG424", "SpiceJet", "Hyderabad", "Delhi",
+                LocalDateTime.of(2025, 10, 13, 13, 0), "2h 30m", 4800.0, 100));
+        flights.add(new Event("AI525", "Air India", "Delhi", "Hyderabad",
+                LocalDateTime.of(2025, 10, 14, 10, 0), "2h 25m", 4600.0, 100));
+        flights.add(new Event("AI525", "Air India", "Vizag", "Hyderabad",
+                LocalDateTime.of(2025, 10, 14, 10, 0), "1h 25m", 4600.0, 100));
+        flights.add(new Event("AI525", "Indigo", "Hyderabad", "Vizag",
+                LocalDateTime.of(2025, 10, 14, 10, 0), "2h 15m", 4600.0, 100));
+                flights.add(new Event("SG626", "SpiceJet", "Hyderabad", "Bangalore",
+                LocalDateTime.of(2025, 10, 15, 17, 0), "1h 5m", 3200.0, 100));
+        flights.add(new Event("6E727", "IndiGo", "Bangalore", "Hyderabad",
+                LocalDateTime.of(2025, 10, 16, 9, 0), "1h 15m", 3400.0, 100));
+        flights.add(new Event("SG828", "SpiceJet", "Hyderabad", "Gannavaram",
+                LocalDateTime.of(2025, 10, 17, 15, 0), "1h 10m", 2300.0, 100));
+        flights.add(new Event("AI929", "Air India", "Gannavaram", "Hyderabad",
+                LocalDateTime.of(2025, 10, 18, 11, 0), "1h 15m", 2500.0, 100));
+        // 1. Display available flights
+        
+                
+
         // 2. Create booking handler
         BookingHandler handler = new BookingHandler(flights);
 

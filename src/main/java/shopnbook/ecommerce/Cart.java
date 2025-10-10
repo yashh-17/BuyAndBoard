@@ -95,7 +95,6 @@ public class Cart {
         System.out.println("\n🛒 UNIFIED CART");
         System.out.println("━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━");
 
-        // Show E-commerce items
         if (!items.isEmpty()) {
             System.out.println("🛍️ E-COMMERCE ITEMS:");
             for (Map.Entry<Product, Integer> entry : items.entrySet()) {
